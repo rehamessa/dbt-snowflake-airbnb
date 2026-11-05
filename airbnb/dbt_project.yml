@@ -13,3 +13,10 @@ snapshot-paths: ["snapshots"]
 clean-targets:
   - "target"
   - "dbt_packages"
+
+
+models:
+  airbnb:
+    +materialized: view
+    dim:
+      +materialized: table
