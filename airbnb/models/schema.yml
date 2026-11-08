@@ -1,5 +1,4 @@
 models:
-
   - name: dim_listings_cleansed
     data_tests:
       - minimum_row_count:
@@ -7,7 +6,6 @@ models:
             min_row_count: 1000
           config:
             severity: error
-
     columns:
 
       - name: listing_id
@@ -44,14 +42,15 @@ models:
 
       - name: host_id
         data_type: integer
+        constraints:
+          - type: not_null
         data_tests:
           - unique
-          - not_null
 
       - name: host_name
         data_type: string
-        data_tests:
-          - not_null
+        constraints:
+          - type: not_null
 
       - name: is_superhost
         data_type: string
