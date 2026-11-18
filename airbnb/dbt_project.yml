@@ -23,6 +23,8 @@ models:
     +materialized: view
     +post-hook:
       - "INSERT INTO {{ target.schema }}.audit_log VALUES ('{{ this }}', CURRENT_TIMESTAMP)"
+    +grants:
+      select: ["transform", "reporter"]
     dim:
       +materialized: table
     src:
