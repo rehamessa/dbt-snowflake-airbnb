@@ -1,0 +1,20 @@
+from textblob import TextBlob
+
+
+def get_sentiment(text):
+    if text is None:
+        return None
+    return TextBlob(text).sentiment.polarity
+
+
+def model(dbt, session):
+    dbt.config(
+        materialized="table",
+        packages=["textblob", "snowflake-connector-python[pandas]"]
+    )
+
+    df = dbt.ref("fct_reviews").to_pandas()
+
+    df["SENTIMENT_SCORE"] = df["REVIEW_TEXT"].apply(get_sentiment)
+
+    return df
