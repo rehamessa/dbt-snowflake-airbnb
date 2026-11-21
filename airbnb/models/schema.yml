@@ -38,9 +38,10 @@ models:
         description: '{{ doc("dim_listing_cleansed__minimum_nights") }}'
         data_tests:
           - positive_values
-
+          
   - name: dim_hosts_cleansed
     description: Cleansed table which contains Airbnb hosts.
+    latest_version: 1
     config:
       contract:
         enforced: true
@@ -75,6 +76,20 @@ models:
       - name: updated_at
         description: When the host record was last updated
         data_type: timestamp
+
+    versions:
+      - v: 1
+        defined_in: dim_hosts_cleansed
+
+      - v: 2
+        columns:
+          - include: all
+            exclude: [host_name]
+          - name: host_name
+            description: The name of the host. Replaced with 'N/A' if missing.
+            data_type: string
+            constraints:
+              - type: not_null
 
   - name: fct_reviews
     columns:
