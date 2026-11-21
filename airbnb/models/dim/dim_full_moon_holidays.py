@@ -9,7 +9,8 @@ def is_holiday(date_value):
 def model(dbt, session):
     dbt.config(
         materialized="table",
-        packages=["holidays", "snowflake-connector-python[pandas]"]
+        packages=["holidays", "snowflake-connector-python[pandas]"],
+        enabled=False
     )
 
     df = dbt.ref("seed_full_moon_dates").to_pandas()
