@@ -16,8 +16,9 @@ clean-targets:
   - "dbt_packages"
 
 on-run-start:
+  - "CREATE SCHEMA IF NOT EXISTS {{ target.schema }}"
   - "CREATE TABLE IF NOT EXISTS {{ target.schema }}.audit_log (model_name STRING, run_timestamp TIMESTAMP)"
-
+  
 models:
   airbnb:
     +materialized: view
