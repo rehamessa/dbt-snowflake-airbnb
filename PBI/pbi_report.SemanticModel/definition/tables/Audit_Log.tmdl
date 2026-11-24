@@ -1,0 +1,40 @@
+table Audit_Log
+	lineageTag: 2c45a8e3-7ff6-48ff-b62d-0b6688e9b319
+
+	column MODEL_NAME
+		dataType: string
+		lineageTag: b2c0f97d-c455-45dc-9336-99f1860c02c1
+		summarizeBy: none
+		sourceColumn: MODEL_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column RUN_TIMESTAMP
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 737fb250-5b44-4d14-9992-630b467797ab
+		summarizeBy: none
+		sourceColumn: RUN_TIMESTAMP
+
+		variation Variation
+			isDefault
+			relationship: 82b92212-f76d-4be3-a0f9-a106b1dfbbf8
+			defaultHierarchy: LocalDateTable_9aade443-3a9a-4fe4-8c7f-84cd6085eeae.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Audit_Log = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("MPSXNPX-UF70368.snowflakecomputing.com","COMPUTE_WH",[Implementation="2.0", Role="ACCOUNTADMIN"]),
+				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
+				    PROD_Schema = AIRBNB_Database{[Name="PROD",Kind="Schema"]}[Data],
+				    AUDIT_LOG_Table = PROD_Schema{[Name="AUDIT_LOG",Kind="Table"]}[Data]
+				in
+				    AUDIT_LOG_Table
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

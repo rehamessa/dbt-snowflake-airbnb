@@ -1,0 +1,84 @@
+table Fact_Reviews
+	lineageTag: 9438ea50-f9ee-4fb9-9f42-a01608eaabc3
+
+	column REVIEW_ID
+		dataType: string
+		lineageTag: 711eb5a6-3052-4ca3-a66b-1873c0e248f8
+		summarizeBy: none
+		sourceColumn: REVIEW_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LISTING_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: dfe941cd-ac52-4d7b-b619-f24eaab83e6d
+		summarizeBy: none
+		sourceColumn: LISTING_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column REVIEW_DATE
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c2ac8e40-a79e-4032-a523-8a524a1ab9d1
+		summarizeBy: none
+		sourceColumn: REVIEW_DATE
+
+		variation Variation
+			isDefault
+			relationship: 38ff3a11-afc3-4cab-81b1-51436a0b2c3e
+			defaultHierarchy: LocalDateTable_e588e411-9eba-4a11-bbd8-da48bf1a01b0.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column REVIEWER_NAME
+		dataType: string
+		lineageTag: d53a331c-ae06-49c6-9dae-627c741f7cfd
+		summarizeBy: none
+		sourceColumn: REVIEWER_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column REVIEW_TEXT
+		dataType: string
+		lineageTag: 2cea6642-ae23-4388-a163-87a762248a07
+		summarizeBy: none
+		sourceColumn: REVIEW_TEXT
+
+		annotation SummarizationSetBy = Automatic
+
+	column REVIEW_SENTIMENT
+		dataType: string
+		lineageTag: ef6321bc-c23c-45a0-ba42-47a09f371dc9
+		summarizeBy: none
+		sourceColumn: REVIEW_SENTIMENT
+
+		annotation SummarizationSetBy = Automatic
+
+	column IS_FULL_MOON
+		dataType: string
+		lineageTag: 039db361-029e-4cbd-a70e-72cc564245ec
+		summarizeBy: none
+		sourceColumn: IS_FULL_MOON
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Reviews = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("MPSXNPX-UF70368.snowflakecomputing.com","COMPUTE_WH",[Implementation="2.0", Role="ACCOUNTADMIN"]),
+				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
+				    MART_Schema = AIRBNB_Database{[Name="MART",Kind="Schema"]}[Data],
+				    MART_FULLMOON_REVIEWS_Table = MART_Schema{[Name="MART_FULLMOON_REVIEWS",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(MART_FULLMOON_REVIEWS_Table,{{"LISTING_ID", Int64.Type}, {"REVIEW_DATE", type date}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

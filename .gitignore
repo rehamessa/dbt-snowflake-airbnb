@@ -17,3 +17,10 @@ set-env.sh
 !airbnb/_prod_profiles/profiles.yml
 
 data_export/
+
+# Power BI local cache (contains data)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Dagster local run history
+.tmp_dagster_home_*/

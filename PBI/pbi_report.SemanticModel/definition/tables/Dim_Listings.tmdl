@@ -1,0 +1,117 @@
+table Dim_Listings
+	lineageTag: b930aa4b-81ee-43ba-86fc-d6412f924057
+
+	column LISTING_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: c4740920-5798-48c7-97dd-b1fd28c40479
+		summarizeBy: none
+		sourceColumn: LISTING_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LISTING_NAME
+		dataType: string
+		lineageTag: 37faaeec-2b09-42ee-8fd7-41c4a397b5ff
+		summarizeBy: none
+		sourceColumn: LISTING_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column ROOM_TYPE
+		dataType: string
+		lineageTag: 758f753e-1d81-4569-8f1d-3ce7d4037049
+		summarizeBy: none
+		sourceColumn: ROOM_TYPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column MINIMUM_NIGHTS
+		dataType: int64
+		formatString: 0
+		lineageTag: 77a9cfc9-a616-4386-b375-d1644351a5e1
+		summarizeBy: sum
+		sourceColumn: MINIMUM_NIGHTS
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRICE
+		dataType: double
+		lineageTag: 2a420aee-ae41-42c0-845d-7ee9d0c85ed2
+		summarizeBy: sum
+		sourceColumn: PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column HOST_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 0202301e-bb74-4756-8b5e-f5efd43f2a9d
+		summarizeBy: none
+		sourceColumn: HOST_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOST_NAME
+		dataType: string
+		lineageTag: c20264cd-bbf7-4077-8ad9-ec41fe4a8059
+		summarizeBy: none
+		sourceColumn: HOST_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOST_IS_SUPERHOST
+		dataType: string
+		lineageTag: 7555cdf1-1672-4d32-a152-0302cf394a0f
+		summarizeBy: none
+		sourceColumn: HOST_IS_SUPERHOST
+
+		annotation SummarizationSetBy = Automatic
+
+	column CREATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3a5d58a0-335c-465d-a343-19f642535c44
+		summarizeBy: none
+		sourceColumn: CREATED_AT
+
+		variation Variation
+			isDefault
+			relationship: c216d9d5-4258-4120-9cdf-d1b173b28dc1
+			defaultHierarchy: LocalDateTable_335f5932-cac5-4858-aaa1-f9689c8bf248.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column UPDATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3cf88562-6f42-4a86-be04-d0bd83f2bcd2
+		summarizeBy: none
+		sourceColumn: UPDATED_AT
+
+		variation Variation
+			isDefault
+			relationship: 1703cb91-5000-4609-aa52-26ea5a7d0112
+			defaultHierarchy: LocalDateTable_ca5e5a3e-ef85-4cc9-a20c-59c41ab6de49.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Listings = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("MPSXNPX-UF70368.snowflakecomputing.com","COMPUTE_WH",[Implementation="2.0", Role="ACCOUNTADMIN"]),
+				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
+				    PROD_Schema = AIRBNB_Database{[Name="PROD",Kind="Schema"]}[Data],
+				    DIM_LISTINGS_W_HOSTS_Table = PROD_Schema{[Name="DIM_LISTINGS_W_HOSTS",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(DIM_LISTINGS_W_HOSTS_Table,{{"HOST_ID", Int64.Type}, {"LISTING_ID", Int64.Type}, {"MINIMUM_NIGHTS", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"PRICE_STR", "PRICE_USD"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

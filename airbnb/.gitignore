@@ -3,3 +3,4 @@ target/
 dbt_packages/
 logs/
 target_prod/
+dbt_internal_packages/

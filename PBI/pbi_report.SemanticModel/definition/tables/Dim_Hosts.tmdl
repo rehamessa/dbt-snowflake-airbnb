@@ -1,0 +1,72 @@
+table Dim_Hosts
+	lineageTag: b37f4297-3b0f-463e-9a46-0cd1a3a37e5a
+
+	column HOST_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 2a856212-54aa-466d-85c9-19381c299308
+		summarizeBy: none
+		sourceColumn: HOST_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column IS_SUPERHOST
+		dataType: string
+		lineageTag: dccef9cf-ae92-4173-b53e-4a9ced679996
+		summarizeBy: none
+		sourceColumn: IS_SUPERHOST
+
+		annotation SummarizationSetBy = Automatic
+
+	column CREATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fd56d5bf-4a1c-40a2-b660-8b85ba4a081f
+		summarizeBy: none
+		sourceColumn: CREATED_AT
+
+		variation Variation
+			isDefault
+			relationship: fed9185e-2f97-4e71-94de-0194f0ab983f
+			defaultHierarchy: LocalDateTable_916d5b7e-23c7-4c20-8740-84694d61bb07.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column UPDATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d3ba3fda-9d38-4e6a-aa6e-1de59149527c
+		summarizeBy: none
+		sourceColumn: UPDATED_AT
+
+		variation Variation
+			isDefault
+			relationship: cf242626-70f0-4754-9551-b25cfd858e56
+			defaultHierarchy: LocalDateTable_83a77e1d-752f-4fba-88ad-09fd2b2187c6.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOST_NAME
+		dataType: string
+		lineageTag: e8a64a5d-3b59-4279-889e-e86bbbd77929
+		summarizeBy: none
+		sourceColumn: HOST_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Hosts = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("MPSXNPX-UF70368.snowflakecomputing.com","COMPUTE_WH",[Implementation="2.0", Role="ACCOUNTADMIN"]),
+				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
+				    PROD_Schema = AIRBNB_Database{[Name="PROD",Kind="Schema"]}[Data],
+				    DIM_HOSTS_CLEANSED_V2_Table = PROD_Schema{[Name="DIM_HOSTS_CLEANSED_V2",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(DIM_HOSTS_CLEANSED_V2_Table,{{"HOST_ID", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

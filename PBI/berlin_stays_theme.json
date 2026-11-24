@@ -1,0 +1,85 @@
+{
+  "name": "Berlin Stays - Starry Night",
+  "dataColors": [
+    "#14617E",
+    "#F2B632",
+    "#172541",
+    "#3E9A6A",
+    "#E8833A",
+    "#6A3E8E",
+    "#5BA4C7",
+    "#AD2F4B"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#172541",
+  "tableAccent": "#14617E",
+  "good": "#3E9A6A",
+  "neutral": "#B8B2A7",
+  "bad": "#AD2F4B",
+  "maximum": "#14617E",
+  "center": "#8FC1D4",
+  "minimum": "#EAF3F6",
+  "textClasses": {
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 28,
+      "color": "#172541"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#172541"
+    },
+    "header": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#172541"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 10,
+      "color": "#546A7B"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#FFFFFF" } },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#E6DFD2" } },
+            "radius": 12
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": true,
+            "color": { "solid": { "color": "#172541" } },
+            "transparency": 90,
+            "preset": "BottomRight"
+          }
+        ],
+        "visualHeader": [
+          { "show": false }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": { "solid": { "color": "#FBF7F0" } },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}
