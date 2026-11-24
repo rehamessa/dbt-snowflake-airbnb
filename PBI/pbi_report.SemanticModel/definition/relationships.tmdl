@@ -1,8 +1,3 @@
-relationship 38ff3a11-afc3-4cab-81b1-51436a0b2c3e
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Fact_Reviews.REVIEW_DATE
-	toColumn: LocalDateTable_e588e411-9eba-4a11-bbd8-da48bf1a01b0.Date
-
 relationship 82b92212-f76d-4be3-a0f9-a106b1dfbbf8
 	joinOnDateBehavior: datePartOnly
 	fromColumn: Audit_Log.RUN_TIMESTAMP
@@ -35,4 +30,8 @@ relationship AutoDetected_199f94d7-49c7-4478-b781-23a2505dfa15
 relationship AutoDetected_7ab95d20-0a40-4643-9358-2e9b34e24ee4
 	fromColumn: Dim_Listings.HOST_ID
 	toColumn: Dim_Hosts.HOST_ID
+
+relationship 712ec85b-6e36-be81-6d8d-ee66cc7961f4
+	fromColumn: Fact_Reviews.REVIEW_DATE
+	toColumn: DimDate.Date
 

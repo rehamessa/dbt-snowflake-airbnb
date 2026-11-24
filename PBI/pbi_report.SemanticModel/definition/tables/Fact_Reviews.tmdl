@@ -25,11 +25,6 @@ table Fact_Reviews
 		summarizeBy: none
 		sourceColumn: REVIEW_DATE
 
-		variation Variation
-			isDefault
-			relationship: 38ff3a11-afc3-4cab-81b1-51436a0b2c3e
-			defaultHierarchy: LocalDateTable_e588e411-9eba-4a11-bbd8-da48bf1a01b0.'Date Hierarchy'
-
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
