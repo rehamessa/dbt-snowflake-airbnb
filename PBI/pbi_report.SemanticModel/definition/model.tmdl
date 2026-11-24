@@ -2,27 +2,22 @@ model Model
 	culture: en-US
 	defaultPowerBIDataSourceVersion: powerBI_V3
 	sourceQueryCulture: en-US
+	maxParallelismPerRefresh: 1
 	valueFilterBehavior: independent
 	dataAccessOptions
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation __PBI_TimeIntelligenceEnabled = 1
+annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
 annotation PBI_QueryOrder = ["Fact_Reviews","Audit_Log","Dim_Hosts","Dim_Listings"]
 
 ref table Fact_Reviews
-ref table DateTableTemplate_943b9a7a-0aa1-4edc-b190-c613dec0b4b5
 ref table Audit_Log
-ref table LocalDateTable_9aade443-3a9a-4fe4-8c7f-84cd6085eeae
 ref table Dim_Hosts
-ref table LocalDateTable_916d5b7e-23c7-4c20-8740-84694d61bb07
-ref table LocalDateTable_83a77e1d-752f-4fba-88ad-09fd2b2187c6
 ref table Dim_Listings
-ref table LocalDateTable_335f5932-cac5-4858-aaa1-f9689c8bf248
-ref table LocalDateTable_ca5e5a3e-ef85-4cc9-a20c-59c41ab6de49
 ref table DimDate
 
 ref cultureInfo en-US

@@ -37,14 +37,6 @@ table Fact_Reviews
 
 		annotation SummarizationSetBy = Automatic
 
-	column REVIEW_TEXT
-		dataType: string
-		lineageTag: 2cea6642-ae23-4388-a163-87a762248a07
-		summarizeBy: none
-		sourceColumn: REVIEW_TEXT
-
-		annotation SummarizationSetBy = Automatic
-
 	column REVIEW_SENTIMENT
 		dataType: string
 		lineageTag: ef6321bc-c23c-45a0-ba42-47a09f371dc9
@@ -69,9 +61,10 @@ table Fact_Reviews
 				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
 				    MART_Schema = AIRBNB_Database{[Name="MART",Kind="Schema"]}[Data],
 				    MART_FULLMOON_REVIEWS_Table = MART_Schema{[Name="MART_FULLMOON_REVIEWS",Kind="Table"]}[Data],
-				    #"Changed Type" = Table.TransformColumnTypes(MART_FULLMOON_REVIEWS_Table,{{"LISTING_ID", Int64.Type}, {"REVIEW_DATE", type date}})
+				    #"Changed Type" = Table.TransformColumnTypes(MART_FULLMOON_REVIEWS_Table,{{"LISTING_ID", Int64.Type}, {"REVIEW_DATE", type date}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"REVIEW_TEXT"})
 				in
-				    #"Changed Type"
+				    #"Removed Columns"
 
 	annotation PBI_NavigationStepName = Navigation
 

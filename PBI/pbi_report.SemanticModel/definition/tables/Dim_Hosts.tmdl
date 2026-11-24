@@ -25,11 +25,6 @@ table Dim_Hosts
 		summarizeBy: none
 		sourceColumn: CREATED_AT
 
-		variation Variation
-			isDefault
-			relationship: fed9185e-2f97-4e71-94de-0194f0ab983f
-			defaultHierarchy: LocalDateTable_916d5b7e-23c7-4c20-8740-84694d61bb07.'Date Hierarchy'
-
 		annotation SummarizationSetBy = Automatic
 
 	column UPDATED_AT
@@ -38,11 +33,6 @@ table Dim_Hosts
 		lineageTag: d3ba3fda-9d38-4e6a-aa6e-1de59149527c
 		summarizeBy: none
 		sourceColumn: UPDATED_AT
-
-		variation Variation
-			isDefault
-			relationship: cf242626-70f0-4754-9551-b25cfd858e56
-			defaultHierarchy: LocalDateTable_83a77e1d-752f-4fba-88ad-09fd2b2187c6.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 

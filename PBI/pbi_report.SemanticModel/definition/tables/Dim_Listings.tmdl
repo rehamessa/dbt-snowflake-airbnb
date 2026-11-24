@@ -77,11 +77,6 @@ table Dim_Listings
 		summarizeBy: none
 		sourceColumn: CREATED_AT
 
-		variation Variation
-			isDefault
-			relationship: c216d9d5-4258-4120-9cdf-d1b173b28dc1
-			defaultHierarchy: LocalDateTable_335f5932-cac5-4858-aaa1-f9689c8bf248.'Date Hierarchy'
-
 		annotation SummarizationSetBy = Automatic
 
 	column UPDATED_AT
@@ -90,11 +85,6 @@ table Dim_Listings
 		lineageTag: 3cf88562-6f42-4a86-be04-d0bd83f2bcd2
 		summarizeBy: none
 		sourceColumn: UPDATED_AT
-
-		variation Variation
-			isDefault
-			relationship: 1703cb91-5000-4609-aa52-26ea5a7d0112
-			defaultHierarchy: LocalDateTable_ca5e5a3e-ef85-4cc9-a20c-59c41ab6de49.'Date Hierarchy'
 
 		annotation SummarizationSetBy = Automatic
 

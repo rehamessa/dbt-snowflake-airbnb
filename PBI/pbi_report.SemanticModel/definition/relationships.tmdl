@@ -1,28 +1,3 @@
-relationship 82b92212-f76d-4be3-a0f9-a106b1dfbbf8
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Audit_Log.RUN_TIMESTAMP
-	toColumn: LocalDateTable_9aade443-3a9a-4fe4-8c7f-84cd6085eeae.Date
-
-relationship fed9185e-2f97-4e71-94de-0194f0ab983f
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Dim_Hosts.CREATED_AT
-	toColumn: LocalDateTable_916d5b7e-23c7-4c20-8740-84694d61bb07.Date
-
-relationship cf242626-70f0-4754-9551-b25cfd858e56
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Dim_Hosts.UPDATED_AT
-	toColumn: LocalDateTable_83a77e1d-752f-4fba-88ad-09fd2b2187c6.Date
-
-relationship c216d9d5-4258-4120-9cdf-d1b173b28dc1
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Dim_Listings.CREATED_AT
-	toColumn: LocalDateTable_335f5932-cac5-4858-aaa1-f9689c8bf248.Date
-
-relationship 1703cb91-5000-4609-aa52-26ea5a7d0112
-	joinOnDateBehavior: datePartOnly
-	fromColumn: Dim_Listings.UPDATED_AT
-	toColumn: LocalDateTable_ca5e5a3e-ef85-4cc9-a20c-59c41ab6de49.Date
-
 relationship AutoDetected_199f94d7-49c7-4478-b781-23a2505dfa15
 	fromColumn: Fact_Reviews.LISTING_ID
 	toColumn: Dim_Listings.LISTING_ID
