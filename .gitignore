@@ -15,3 +15,5 @@ set-env.ps1
 set-env.sh
 
 !airbnb/_prod_profiles/profiles.yml
+
+data_export/
