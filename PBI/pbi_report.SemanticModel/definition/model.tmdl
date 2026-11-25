@@ -19,6 +19,7 @@ ref table Audit_Log
 ref table Dim_Hosts
 ref table Dim_Listings
 ref table DimDate
+ref table _Measures
 
 ref cultureInfo en-US
 

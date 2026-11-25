@@ -1,0 +1,65 @@
+table _Measures
+	lineageTag: 7c791ee2-3dd1-4c2d-b59b-062eb656728c
+
+	measure 'Total Reviews' = COUNTROWS(Fact_Reviews)
+		formatString: #,0
+		lineageTag: 753ff3b8-1c25-4a28-b18c-383a8bf93571
+
+	measure 'Total Listings' = COUNTROWS(Dim_Listings)
+		formatString: #,0
+		lineageTag: 68629bb8-be7e-4551-b709-5f18f340ef9c
+
+	measure 'Total Hosts' = COUNTROWS(Dim_Hosts)
+		formatString: #,0
+		lineageTag: 9c753291-b51e-4a3c-a274-738e85060400
+
+	measure 'Avg Price' = AVERAGE(Dim_Listings[PRICE])
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		lineageTag: 2d15fe2a-0c9c-4539-bd74-ebb26beb2efc
+
+	measure 'Positive %' = DIVIDE(CALCULATE([Total Reviews], Fact_Reviews[REVIEW_SENTIMENT] = "positive"), [Total Reviews])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b9815acb-b0b6-476e-a501-9368369a144f
+
+	measure 'Negative %' = DIVIDE(CALCULATE([Total Reviews], Fact_Reviews[REVIEW_SENTIMENT] = "negative"), [Total Reviews])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a1253144-e968-4a1f-a4a1-84e73917d064
+
+	measure 'Reviews YoY %' =
+			
+			VAR ReviewsThisYear = [Total Reviews]
+			VAR ReviewsLastYear = CALCULATE([Total Reviews], SAMEPERIODLASTYEAR(DimDate[Date]))
+			RETURN DIVIDE(ReviewsThisYear - ReviewsLastYear, ReviewsLastYear)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a746f001-c9b7-4806-816b-184bb2031101
+
+	measure 'Superhost %' = DIVIDE(CALCULATE([Total Hosts], Dim_Hosts[HOST_STATUS] = "superhost"), [Total Hosts])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 51f99af5-4653-47ca-95d0-33109281d9a6
+
+	measure 'Large Hosts Share of Listings' =
+			
+			DIVIDE(
+			    CALCULATE(SUM(Dim_Hosts[TOTAL_LISTINGS]), Dim_Hosts[PORTFOLIO_SIZE] = "large_portfolio"),
+			    SUM(Dim_Hosts[TOTAL_LISTINGS])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 12289a44-b65a-4469-874c-d6221cfff200
+
+	column Column
+		formatString: 0
+		lineageTag: 209c5db8-d55b-4e69-a768-c673bf4cdd72
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 820f7aa486c4445183757317fb02fbd5
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+
