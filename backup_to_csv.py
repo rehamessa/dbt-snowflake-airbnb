@@ -33,6 +33,7 @@ tables = {
     "raw_reviews": "RAW.RAW_REVIEWS",
     # Pipeline run history (for the data quality page)
     "audit_log": "PROD.AUDIT_LOG",
+    "int_host_performance": "PROD.INT_HOST_PERFORMANCE",
 }
 
 os.makedirs("data_export", exist_ok=True)
