@@ -1,0 +1,32 @@
+models:
+  - name: int_host_performance
+    description: One row per host with listing counts, price statistics and host classifications.
+    data_tests:
+      - dbt_expectations.expect_table_row_count_to_equal_other_table:
+          arguments:
+            compare_model: ref('dim_hosts_cleansed')
+    columns:
+      - name: host_id
+        description: Primary key for the host
+        data_tests:
+          - unique
+          - not_null
+      - name: total_listings
+        description: Number of listings owned by the host
+      - name: portfolio_size
+        description: Host size based on number of listings
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['inactive', 'single_listing', 'small_portfolio', 'medium_portfolio', 'large_portfolio']
+      - name: host_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['superhost', 'standard']
+      - name: host_tenure
+        description: Host tenure relative to the latest date in the data
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['new_host', 'experienced_host', 'veteran_host']
