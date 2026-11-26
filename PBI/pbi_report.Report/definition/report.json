@@ -48,6 +48,10 @@
       }
     ]
   },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "deneb7E15AEF80B9E4D4F8E12924291ECE89A"
+  ],
   "resourcePackages": [
     {
       "name": "SharedResources",
@@ -64,6 +68,11 @@
       "name": "RegisteredResources",
       "type": "RegisteredResources",
       "items": [
+        {
+          "name": "_CITYPNG.COM_HD_Black_Airbnb_S23661833868891002.png",
+          "path": "_CITYPNG.COM_HD_Black_Airbnb_S23661833868891002.png",
+          "type": "Image"
+        },
         {
           "name": "Berlin_Stays_-_Starry_Night6805711424622182.json",
           "path": "Berlin_Stays_-_Starry_Night6805711424622182.json",

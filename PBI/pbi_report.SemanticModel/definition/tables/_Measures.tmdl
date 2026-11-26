@@ -46,6 +46,48 @@ table _Measures
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 12289a44-b65a-4469-874c-d6221cfff200
 
+	measure 'HTML Hero' =
+			
+			VAR _Listings  = FORMAT([Total Listings], "#,0")
+			VAR _Hosts     = FORMAT([Total Hosts], "#,0")
+			VAR _Reviews   = FORMAT([Total Reviews] / 1000, "#,0.0") & "K"
+			VAR _Price     = FORMAT([Avg Price], "$#,0")
+			
+			VAR _EntireHomePct =
+			    FORMAT(DIVIDE(CALCULATE(COUNTROWS(Dim_Listings), Dim_Listings[ROOM_TYPE] = "Entire home/apt"), COUNTROWS(Dim_Listings)), "0%")
+			VAR _SingleHostPct =
+			    FORMAT(DIVIDE(CALCULATE(COUNTROWS(Dim_Hosts), Dim_Hosts[PORTFOLIO_SIZE] = "single_listing"), COUNTROWS(Dim_Hosts)), "0%")
+			VAR _PositivePct = FORMAT([Positive %], "0%")
+			VAR _MedianPrice = FORMAT(MEDIAN(Dim_Listings[PRICE]), "$#,0")
+			
+			VAR _FirstYear = YEAR(MIN(Fact_Reviews[REVIEW_DATE]))
+			VAR _LastYear  = MAXX(FILTER(VALUES(DimDate[Year]), CALCULATE([Total Reviews]) > 10), DimDate[Year])
+			
+			VAR _Card =
+			    "<div style='flex:1;background:#FFFFFF;border-radius:12px;padding:14px 18px;border-top:4px solid #F2B632;box-shadow:0 2px 6px rgba(23,37,65,0.06);'>" &
+			        "<div style='font-size:11px;letter-spacing:1.5px;color:#8A7F6E;text-transform:uppercase;'>{l}</div>" &
+			        "<div style='font-size:32px;font-weight:600;color:#14617E;line-height:1.15;margin-top:2px;'>{v}</div>" &
+			        "<div style='font-size:12px;color:#6B6255;margin-top:4px;'>{s}</div>" &
+			    "</div>"
+			
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;background:linear-gradient(135deg,#FFF8EC 0%,#F7E7C6 100%);border:1px solid #E9D8B4;border-radius:16px;padding:20px 24px;height:100%;box-sizing:border-box;overflow:hidden;'>" &
+			
+			    "<div style='padding-left:72px;min-height:56px;'>" &
+			        "<div style='font-size:26px;font-weight:600;color:#172541;line-height:1.2;'>Airbnb: Market &amp; Guest Experience</div>" &
+			        "<div style='font-size:13px;color:#6B6255;margin-top:2px;'>" & _FirstYear & "–" & _LastYear & " · Snowflake → dbt (tested &amp; documented) → Power BI</div>" &
+			    "</div>" &
+			
+			    "<div style='display:flex;gap:14px;margin-top:16px;'>" &
+			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Listings"),          "{v}", _Listings), "{s}", _EntireHomePct & " are entire homes") &
+			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Hosts"),             "{v}", _Hosts),    "{s}", _SingleHostPct & " own a single listing") &
+			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Reviews"),           "{v}", _Reviews),  "{s}", _PositivePct & " positive") &
+			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Avg nightly price"), "{v}", _Price),    "{s}", "Median " & _MedianPrice) &
+			    "</div>" &
+			
+			"</div>"
+		lineageTag: 1efe538d-459f-425c-966b-bc63698ba02e
+
 	column Column
 		formatString: 0
 		lineageTag: 209c5db8-d55b-4e69-a768-c673bf4cdd72
