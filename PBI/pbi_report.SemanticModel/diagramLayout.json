@@ -4,14 +4,14 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 214.15384145883414,
-        "y": 154.28039702233252
+        "x": 30.769230769230766,
+        "y": 46.769230182354264
       },
       "nodes": [
         {
           "location": {
             "x": 1128.1895016275971,
-            "y": 372.29032258064512
+            "y": 409.79032258064512
           },
           "nodeIndex": "Audit_Log",
           "nodeLineageTag": "2c45a8e3-7ff6-48ff-b62d-0b6688e9b319",
@@ -24,7 +24,7 @@
         {
           "location": {
             "x": 868.38305001469359,
-            "y": 592.741935483871
+            "y": 630.241935483871
           },
           "nodeIndex": "Dim_Hosts",
           "nodeLineageTag": "b37f4297-3b0f-463e-9a46-0cd1a3a37e5a",
@@ -37,7 +37,7 @@
         {
           "location": {
             "x": 468.07252893512066,
-            "y": 566.93548387096769
+            "y": 604.43548387096769
           },
           "nodeIndex": "Dim_Listings",
           "nodeLineageTag": "b930aa4b-81ee-43ba-86fc-d6412f924057",
@@ -50,7 +50,7 @@
         {
           "location": {
             "x": 424.19354838709671,
-            "y": 113.70967741935483
+            "y": 151.20967741935482
           },
           "nodeIndex": "Fact_Reviews",
           "nodeLineageTag": "9438ea50-f9ee-4fb9-9f42-a01608eaabc3",
@@ -63,7 +63,7 @@
         {
           "location": {
             "x": 1136.3830500146937,
-            "y": 75
+            "y": 112.5
           },
           "nodeIndex": "DimDate",
           "size": {
@@ -75,11 +75,24 @@
         {
           "location": {
             "x": 996.189501627597,
-            "y": 320.96774193548384
+            "y": 358.46774193548384
           },
           "nodeIndex": "_Measures",
           "size": {
             "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 996.189501627597,
+            "y": 283.46774193548384
+          },
+          "nodeIndex": "dbt_Run_Results",
+          "nodeLineageTag": "35f42d4b-c5b4-4a93-a576-9fdb14b5b2ff",
+          "size": {
+            "height": 300,
             "width": 234
           },
           "zIndex": 0

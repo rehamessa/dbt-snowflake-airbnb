@@ -1,0 +1,132 @@
+table dbt_Run_Results
+	lineageTag: 35f42d4b-c5b4-4a93-a576-9fdb14b5b2ff
+
+	column unique_id
+		dataType: string
+		lineageTag: 2550b7c8-aea3-4343-8a21-e764fd3cc761
+		summarizeBy: none
+		sourceColumn: unique_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Resource Type'
+		dataType: string
+		lineageTag: 55bd84af-44f3-473d-9e50-a718e84337b5
+		summarizeBy: none
+		sourceColumn: Resource Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Node Name'
+		dataType: string
+		lineageTag: d1a19073-ec01-4d87-893d-9f01de23d04f
+		summarizeBy: none
+		sourceColumn: Node Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: f83a41c7-72e1-4e36-9f15-2c81c64fae44
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column execution_time
+		dataType: double
+		lineageTag: c90e54e9-f265-4443-9735-d302b2c42317
+		summarizeBy: sum
+		sourceColumn: execution_time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Thread
+		dataType: string
+		lineageTag: d54d07a4-14e4-4423-b4f2-520c7e8ceb94
+		summarizeBy: none
+		sourceColumn: Thread
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Started At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9ef19118-9dba-42e8-89f6-12304b4cb4cf
+		summarizeBy: none
+		sourceColumn: Started At
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Completed At'
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 567ba9aa-a210-4809-b462-8c7d25ed46d1
+		summarizeBy: none
+		sourceColumn: Completed At
+
+		annotation SummarizationSetBy = Automatic
+
+	column failures
+		dataType: int64
+		formatString: 0
+		lineageTag: e4a4608c-bfcc-4f0d-a687-548fe37ccaa8
+		summarizeBy: sum
+		sourceColumn: failures
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Test Category'
+		dataType: string
+		lineageTag: 22b17d67-c2fc-406e-8038-fe625aaf23eb
+		summarizeBy: none
+		sourceColumn: Test Category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dbt_Run_Results = m
+		mode: import
+		source =
+				let
+				    Source = Json.Document(File.Contents("E:\dbt-snowflake-airbnb\PBI\dbt_artifacts\run_results.json")),
+				    Results = Table.FromList(Source[results], Splitter.SplitByNothing(), {"r"}),
+				    Expanded = Table.ExpandRecordColumn(Results, "r",
+				        {"unique_id", "status", "execution_time", "thread_id", "timing", "failures"}),
+				    WithExec = Table.AddColumn(Expanded, "exec",
+				        each try List.Last(List.Select([timing], (t) => t[name] = "execute")) otherwise null),
+				    Started = Table.AddColumn(WithExec, "Started At",
+				        each try DateTimeZone.RemoveZone(DateTimeZone.FromText([exec][started_at])) otherwise null, type datetime),
+				    Completed = Table.AddColumn(Started, "Completed At",
+				        each try DateTimeZone.RemoveZone(DateTimeZone.FromText([exec][completed_at])) otherwise null, type datetime),
+				    ResType = Table.AddColumn(Completed, "Resource Type",
+				        each Text.Split([unique_id], "."){0}, type text),
+				    NodeName = Table.AddColumn(ResType, "Node Name",
+				    each let p = Text.Split([unique_id], ".")
+				            in if p{0} = "unit_test" and List.Count(p) > 3 then p{3}
+				            else if p{0} = "model" and List.Count(p) > 3 then p{2} & "_" & p{3}
+				            else p{2}, type text),
+				    Thread = Table.AddColumn(NodeName, "Thread",
+				        each Text.BeforeDelimiter([thread_id], " "), type text),
+				    TestCat = Table.AddColumn(Thread, "Test Category",
+				        each let n = [Node Name] in
+				            if [Resource Type] <> "test" then null
+				            else if Text.StartsWith(n, "dbt_expectations") then "dbt_expectations"
+				            else if Text.StartsWith(n, "unique_") then "unique"
+				            else if Text.StartsWith(n, "not_null_") then "not_null"
+				            else if Text.StartsWith(n, "accepted_values_") then "accepted_values"
+				            else if Text.StartsWith(n, "relationships_") then "relationships"
+				            else "custom", type text),
+				    Final = Table.SelectColumns(TestCat,
+				        {"unique_id", "Resource Type", "Node Name", "status", "execution_time",
+				         "Thread", "Started At", "Completed At", "failures", "Test Category"}),
+				    Typed = Table.TransformColumnTypes(Final,
+				        {{"status", type text}, {"execution_time", type number}, {"failures", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

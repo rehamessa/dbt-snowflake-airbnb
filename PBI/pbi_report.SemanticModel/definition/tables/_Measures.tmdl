@@ -179,7 +179,7 @@ table _Measures
 			VAR _Super   = DIVIDE(COUNTROWS(FILTER(Dim_Hosts, Dim_Hosts[HOST_STATUS] = "superhost")), _Hosts)
 			VAR _Chip = "display:inline-block;margin-left:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.75);border:1px solid #E9D8B4;font-size:12px;color:#6B6255;"
 			RETURN
-			"<div style='font-family:Segoe UI, sans-serif;height:84px;box-sizing:border-box;padding:0 24px 0 84px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;background:linear-gradient(90deg, #FFFFFF 0%, #FBF3E0 55%, #F3DFA9 100%);'>" &
+			"<div style='font-family:Segoe UI, sans-serif;height:80px;box-sizing:border-box;padding:0 24px 0 84px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;border-radius:12px;border:1px solid #E9D8B4;background:linear-gradient(90deg, #FFFFFF 0%, #FBF3E0 55%, #F3DFA9 100%);'>" &
 			    "<div>" &
 			        "<div style='font-size:20px;font-weight:600;color:#172541;'>Hosts &amp; Pricing</div>" &
 			        "<div style='font-size:12px;color:#8A7F6E;margin-top:2px;'>Who lists on Airbnb, and how host size and status shape the price</div>" &
@@ -191,6 +191,102 @@ table _Measures
 			    "</div>" &
 			"</div>"
 		lineageTag: 6d8bfb3e-ee47-49ab-914e-04f6fa641570
+
+	measure 'HTML Header Pipeline' = ```
+			
+			VAR _Nodes  = CALCULATE(COUNTROWS(dbt_Run_Results), dbt_Run_Results[Resource Type] <> "operation")
+			VAR _Issues = CALCULATE(COUNTROWS(dbt_Run_Results), dbt_Run_Results[status] IN {"warn", "fail", "error"})
+			VAR _Start  = MIN(dbt_Run_Results[Started At])
+			VAR _Chip = "display:inline-block;margin-left:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.75);border:1px solid #E9D8B4;font-size:12px;color:#6B6255;"
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;height:80px;box-sizing:border-box;padding:0 24px 0 84px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;border-radius:12px;border:1px solid #E9D8B4;background:linear-gradient(90deg, #FFFFFF 0%, #FBF3E0 55%, #F3DFA9 100%);'>" &
+			    "<div>" &
+			        "<div style='font-size:20px;font-weight:600;color:#172541;'>Pipeline Health</div>" &
+			        "<div style='font-size:12px;color:#8A7F6E;margin-top:2px;'>Can we trust the numbers? Every model and test from the last dbt build</div>" &
+			    "</div>" &
+			    "<div style='white-space:nowrap;'>" &
+			        "<span style='" & _Chip & "'><b style='color:#14617E;'>" & _Nodes & "</b> nodes</span>" &
+			        "<span style='" & _Chip & "'>run on <b style='color:#14617E;'>" & FORMAT(_Start, "d mmm yyyy") & "</b></span>" &
+			        "<span style='" & _Chip & "'><b style='color:" & IF(_Issues > 0, "#E8833A", "#3E9A6A") & ";'>" & _Issues & "</b> " & IF(_Issues = 1, "warning", "warnings") & "</span>" &
+			    "</div>" &
+			"</div>"
+			
+			```
+		lineageTag: 0d1fe000-4c7b-4e19-b133-49fea51cec94
+
+	measure 'HTML Pipeline Scorecard' =
+			
+			VAR _T       = dbt_Run_Results
+			VAR _Checks  = COUNTROWS(FILTER(dbt_Run_Results, dbt_Run_Results[Resource Type] IN {"test", "unit_test"}))
+			VAR _Passed  = COUNTROWS(FILTER(dbt_Run_Results, dbt_Run_Results[Resource Type] IN {"test", "unit_test"} && dbt_Run_Results[status] = "pass"))
+			VAR _Warn    = COUNTROWS(FILTER(dbt_Run_Results, dbt_Run_Results[status] = "warn"))
+			VAR _Fail    = COUNTROWS(FILTER(dbt_Run_Results, dbt_Run_Results[status] IN {"fail", "error"})) + 0
+			VAR _Built   = COUNTROWS(FILTER(dbt_Run_Results, dbt_Run_Results[Resource Type] IN {"model", "snapshot", "seed"}))
+			VAR _Start   = MIN(dbt_Run_Results[Started At])
+			VAR _End     = MAX(dbt_Run_Results[Completed At])
+			VAR _Dur     = DATEDIFF(_Start, _End, SECOND)
+			VAR _DurTxt  = INT(_Dur / 60) & "m " & FORMAT(MOD(_Dur, 60), "00") & "s"
+			VAR _PassPct = DIVIDE(_Passed, _Checks)
+			VAR _Deg     = FORMAT(_PassPct * 360, "0")
+			VAR _Slow    = TOPN(1, FILTER(_T, dbt_Run_Results[Resource Type] = "model"), dbt_Run_Results[execution_time], DESC)
+			VAR _SlowNm  = MAXX(_Slow, dbt_Run_Results[Node Name])
+			VAR _SlowSec = MAXX(_Slow, dbt_Run_Results[execution_time])
+			VAR _SlowPct = DIVIDE(_SlowSec, _Dur)
+			VAR _Stat = "display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F1EADB;font-size:13px;"
+			VAR _Issues =
+			    CONCATENATEX(
+			        FILTER(_T, dbt_Run_Results[status] IN {"warn", "fail", "error"}),
+			        "<div style='margin-top:6px;padding:8px 10px;border-radius:8px;background:#FDF1E7;border-left:3px solid " &
+			            IF(dbt_Run_Results[status] = "warn", "#E8833A", "#AD2F4B") & ";'>" &
+			            "<div style='font-size:11px;font-weight:600;color:" & IF(dbt_Run_Results[status] = "warn", "#E8833A", "#AD2F4B") & ";'>" &
+			                UPPER(dbt_Run_Results[status]) & " &middot; " & dbt_Run_Results[failures] & " row(s)</div>" &
+			            "<div style='font-size:11px;color:#172541;word-break:break-all;margin-top:2px;'>" &
+			                SUBSTITUTE(dbt_Run_Results[Node Name], "dbt_expectations_", "") & "</div>" &
+			        "</div>",
+			        ""
+			    )
+			VAR _IssueBlock =
+			    IF(
+			        _Warn + _Fail > 0,
+			        "<div style='margin-top:14px;font-size:11px;letter-spacing:1.5px;color:#B8860B;font-weight:600;'>NEEDS ATTENTION</div>" & _Issues,
+			        ""
+			    )
+			VAR _Pill = "display:inline-block;margin:6px 6px 0 0;padding:4px 10px;border-radius:999px;background:#EAF3F6;color:#14617E;font-size:11px;font-weight:600;"
+			VAR _StackBlock =
+			    "<div style='margin-top:16px;font-size:11px;letter-spacing:1.5px;color:#B8860B;font-weight:600;'>HOW IT RUNS</div>" &
+			    "<div>" &
+			        "<span style='" & _Pill & "'>Snowflake</span>" &
+			        "<span style='" & _Pill & "'>dbt Core 1.11</span>" &
+			        "<span style='" & _Pill & "'>Slim CI on every PR</span>" &
+			        "<span style='" & _Pill & "'>GitHub Actions prod build</span>" &
+			        "<span style='" & _Pill & "'>Dagster orchestration</span>" &
+			    "</div>"
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;padding:16px 20px;box-sizing:border-box;'>" &
+			    "<div style='font-size:11px;letter-spacing:2px;color:#B8860B;font-weight:600;'>DATA QUALITY</div>" &
+			    "<div style='font-size:20px;font-weight:600;color:#172541;margin-top:2px;'>" &
+			        IF(_Fail = 0, "Nothing broke. One thing to watch.", "Some checks failed") & "</div>" &
+			    "<div style='display:flex;align-items:center;gap:18px;margin:16px 0 10px;'>" &
+			        "<div style='width:110px;height:110px;border-radius:50%;background:conic-gradient(#3E9A6A 0deg " & _Deg & "deg, #E8833A " & _Deg & "deg 360deg);display:flex;align-items:center;justify-content:center;flex:none;'>" &
+			            "<div style='width:84px;height:84px;border-radius:50%;background:#FFFFFF;display:flex;flex-direction:column;align-items:center;justify-content:center;'>" &
+			                "<div style='font-size:22px;font-weight:700;color:#172541;line-height:1;'>" & _Passed & "<span style='font-size:13px;color:#8A7F6E;'>/" & _Checks & "</span></div>" &
+			                "<div style='font-size:10px;color:#8A7F6E;margin-top:2px;'>checks passed</div>" &
+			            "</div>" &
+			        "</div>" &
+			        "<div style='font-size:12px;color:#6B6255;line-height:1.5;'>" &
+			            "<b style='color:#3E9A6A;'>" & FORMAT(_PassPct, "0%") & "</b> of tests passed.<br>" &
+			            "Warnings flag bad data <b>without</b> stopping the pipeline." &
+			        "</div>" &
+			    "</div>" &
+			    "<div style='" & _Stat & "'><span style='color:#6B6255;'>Models, snapshots &amp; seeds built</span><b style='color:#14617E;'>" & _Built & "</b></div>" &
+			    "<div style='" & _Stat & "'><span style='color:#6B6255;'>Build time</span><b style='color:#14617E;'>" & _DurTxt & "</b></div>" &
+			    "<div style='" & _Stat & "'><span style='color:#6B6255;'>Failed / errored</span><b style='color:" & IF(_Fail = 0, "#3E9A6A", "#AD2F4B") & ";'>" & _Fail & "</b></div>" &
+			    "<div style='margin-top:14px;font-size:11px;letter-spacing:1.5px;color:#B8860B;font-weight:600;'>BOTTLENECK</div>" &
+			    "<div style='font-size:12px;color:#172541;margin-top:4px;line-height:1.5;'><b>" & _SlowNm & "</b> (Python model) took <b>" & FORMAT(_SlowSec, "0") & "s</b>, " &
+			        "<b style='color:#B8860B;'>" & FORMAT(_SlowPct, "0%") & "</b> of the whole build.</div>" &
+			    _IssueBlock &
+			    "</div>"
+		lineageTag: 6474b10f-937c-434d-8191-d05422e05469
 
 	column Column
 		formatString: 0
