@@ -18,29 +18,167 @@ table Dim_Hosts
 
 		annotation SummarizationSetBy = Automatic
 
-	column CREATED_AT
-		dataType: dateTime
-		formatString: General Date
-		lineageTag: fd56d5bf-4a1c-40a2-b660-8b85ba4a081f
-		summarizeBy: none
-		sourceColumn: CREATED_AT
-
-		annotation SummarizationSetBy = Automatic
-
-	column UPDATED_AT
-		dataType: dateTime
-		formatString: General Date
-		lineageTag: d3ba3fda-9d38-4e6a-aa6e-1de59149527c
-		summarizeBy: none
-		sourceColumn: UPDATED_AT
-
-		annotation SummarizationSetBy = Automatic
-
 	column HOST_NAME
 		dataType: string
 		lineageTag: e8a64a5d-3b59-4279-889e-e86bbbd77929
 		summarizeBy: none
 		sourceColumn: HOST_NAME
+
+		annotation SummarizationSetBy = Automatic
+
+	column TOTAL_LISTINGS
+		dataType: double
+		lineageTag: 718619d5-d301-4f3b-9f97-639b7f95279f
+		summarizeBy: none
+		sourceColumn: TOTAL_LISTINGS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AVG_LISTING_PRICE
+		dataType: double
+		lineageTag: 73334f1f-2326-4177-800d-2bfed05dd7f9
+		summarizeBy: none
+		sourceColumn: AVG_LISTING_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MIN_LISTING_PRICE
+		dataType: double
+		lineageTag: 617a5773-6822-431b-b481-d83e331b9f94
+		summarizeBy: none
+		sourceColumn: MIN_LISTING_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MAX_LISTING_PRICE
+		dataType: double
+		lineageTag: 6fd2cd31-f5ad-4e92-a466-d0aea957d127
+		summarizeBy: none
+		sourceColumn: MAX_LISTING_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ENTIRE_HOME_COUNT
+		dataType: double
+		lineageTag: 43100e3b-c3b6-4970-823f-9aba356f9079
+		summarizeBy: none
+		sourceColumn: ENTIRE_HOME_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PRIVATE_ROOM_COUNT
+		dataType: double
+		lineageTag: ba8b5132-c6ae-46f1-9bd8-8a89ab6ed60a
+		summarizeBy: none
+		sourceColumn: PRIVATE_ROOM_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SHARED_ROOM_COUNT
+		dataType: double
+		lineageTag: 8b9cb1b2-07de-4b52-91d8-350ef60a48d5
+		summarizeBy: none
+		sourceColumn: SHARED_ROOM_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column HOTEL_ROOM_COUNT
+		dataType: double
+		lineageTag: 2ffe8a96-d1f0-4195-9f29-4e6aa6190422
+		summarizeBy: none
+		sourceColumn: HOTEL_ROOM_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AVG_MINIMUM_NIGHTS
+		dataType: double
+		lineageTag: 7c525bc9-9537-4062-a367-20ea457e95ef
+		summarizeBy: none
+		sourceColumn: AVG_MINIMUM_NIGHTS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PORTFOLIO_SIZE
+		dataType: string
+		lineageTag: 7a12c7c6-66d6-4b39-b57b-2eb681862839
+		summarizeBy: none
+		sourceColumn: PORTFOLIO_SIZE
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOST_STATUS
+		dataType: string
+		lineageTag: e8aad1e5-30b7-496e-afee-57005cede3a6
+		summarizeBy: none
+		sourceColumn: HOST_STATUS
+
+		annotation SummarizationSetBy = Automatic
+
+	column HOST_TENURE
+		dataType: string
+		lineageTag: eba0e90f-185c-4ec5-9839-d80e0e4ed72c
+		summarizeBy: none
+		sourceColumn: HOST_TENURE
+
+		annotation SummarizationSetBy = Automatic
+
+	column DOMINANT_ROOM_TYPE
+		dataType: string
+		lineageTag: 3bef5cd2-9662-4e60-a933-1ef2c024b736
+		summarizeBy: none
+		sourceColumn: DOMINANT_ROOM_TYPE
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Portfolio Order' =
+			
+			SWITCH(
+			    Dim_Hosts[PORTFOLIO_SIZE],
+			    "single_listing", 1,
+			    "small_portfolio", 2,
+			    "medium_portfolio", 3,
+			    "large_portfolio", 4,
+			    0
+			)
+		formatString: 0
+		lineageTag: 24e6b7b0-2792-47ad-91e0-14a5e0c67b62
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Portfolio Label' =
+			
+			SWITCH(
+			    Dim_Hosts[PORTFOLIO_SIZE],
+			    "single_listing", "1 listing",
+			    "small_portfolio", "2-5",
+			    "medium_portfolio", "6-15",
+			    "large_portfolio", "16+",
+			    "None"
+			)
+		lineageTag: 02a1921d-79f3-4dcb-81fe-accf1b3244ac
+		summarizeBy: none
+		sortByColumn: 'Portfolio Order'
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
@@ -51,7 +189,7 @@ table Dim_Hosts
 				    Source = Snowflake.Databases("MPSXNPX-UF70368.snowflakecomputing.com","COMPUTE_WH",[Implementation="2.0", Role="ACCOUNTADMIN"]),
 				    AIRBNB_Database = Source{[Name="AIRBNB",Kind="Database"]}[Data],
 				    PROD_Schema = AIRBNB_Database{[Name="PROD",Kind="Schema"]}[Data],
-				    DIM_HOSTS_CLEANSED_V2_Table = PROD_Schema{[Name="DIM_HOSTS_CLEANSED_V2",Kind="Table"]}[Data],
+				    DIM_HOSTS_CLEANSED_V2_Table = PROD_Schema{[Name="INT_HOST_PERFORMANCE",Kind="Table"]}[Data],
 				    #"Changed Type" = Table.TransformColumnTypes(DIM_HOSTS_CLEANSED_V2_Table,{{"HOST_ID", Int64.Type}})
 				in
 				    #"Changed Type"

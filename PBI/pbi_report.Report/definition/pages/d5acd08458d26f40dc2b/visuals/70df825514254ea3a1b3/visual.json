@@ -1,0 +1,270 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "70df825514254ea3a1b3",
+  "position": {
+    "x": 24.12881267181568,
+    "y": 516.35659117685555,
+    "z": 6000,
+    "height": 185.79185757298075,
+    "width": 608.04607932975512,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Listings"
+                    }
+                  },
+                  "Property": "ROOM_TYPE"
+                }
+              },
+              "queryRef": "Dim_Listings.ROOM_TYPE",
+              "nativeQueryRef": "ROOM_TYPE"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Listings"
+                }
+              },
+              "queryRef": "_Measures.Total Listings",
+              "nativeQueryRef": "Total Listings"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Price"
+                }
+              },
+              "queryRef": "_Measures.Avg Price",
+              "nativeQueryRef": "Avg Price"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Dim_Listings"
+                  }
+                },
+                "Property": "ROOM_TYPE"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\r\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\r\n  \"data\": {\r\n    \"name\": \"dataset\"\r\n  },\r\n  \"transform\": [\r\n    {\r\n      \"calculate\": \"datum.ROOM_TYPE == ''Entire home/apt'' ? ''Entire home'' : datum.ROOM_TYPE\",\r\n      \"as\": \"room\"\r\n    },\r\n    {\r\n      \"calculate\": \"datum[''Avg Price''] * datum[''Total Listings'']\",\r\n      \"as\": \"rev\"\r\n    },\r\n    {\r\n      \"window\": [\r\n        {\r\n          \"op\": \"rank\",\r\n          \"as\": \"r_price\"\r\n        }\r\n      ],\r\n      \"sort\": [\r\n        {\r\n          \"field\": \"Avg Price\",\r\n          \"order\": \"descending\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"hconcat\": [\r\n    {\r\n      \"width\": 190,\r\n      \"height\": 130,\r\n      \"layer\": [\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 0,\r\n            \"fontSize\": 11,\r\n            \"color\": \"#8A7F6E\",\r\n            \"text\": \"AVG NIGHTLY PRICE\",\r\n            \"letterSpacing\": 1.5\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"aggregate\": [\r\n                {\r\n                  \"op\": \"count\",\r\n                  \"as\": \"n\"\r\n                }\r\n              ]\r\n            }\r\n          ]\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 22,\r\n            \"fontSize\": 34,\r\n            \"color\": \"#14617E\",\r\n            \"fontWeight\": 600\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"aggregate\": [\r\n                {\r\n                  \"op\": \"sum\",\r\n                  \"field\": \"rev\",\r\n                  \"as\": \"s\"\r\n                },\r\n                {\r\n                  \"op\": \"sum\",\r\n                  \"field\": \"Total Listings\",\r\n                  \"as\": \"n\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"calculate\": \"datum.s / datum.n\",\r\n              \"as\": \"avg\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"avg\",\r\n              \"format\": \"$,.0f\"\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 76,\r\n            \"fontSize\": 12,\r\n            \"color\": \"#B8860B\",\r\n            \"fontWeight\": 600\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"filter\": \"datum[''Total Listings''] >= 50\"\r\n            },\r\n            {\r\n              \"window\": [\r\n                {\r\n                  \"op\": \"rank\",\r\n                  \"as\": \"r\"\r\n                }\r\n              ],\r\n              \"sort\": [\r\n                {\r\n                  \"field\": \"Avg Price\",\r\n                  \"order\": \"descending\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"filter\": \"datum.r == 1\"\r\n            },\r\n            {\r\n              \"calculate\": \"''Highest: '' + datum.room + '' '' + format(datum[''Avg Price''], ''$,.0f'')\",\r\n              \"as\": \"t\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"t\"\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 96,\r\n            \"fontSize\": 12,\r\n            \"color\": \"#6B6255\"\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"filter\": \"datum[''Total Listings''] >= 50\"\r\n            },\r\n            {\r\n              \"window\": [\r\n                {\r\n                  \"op\": \"rank\",\r\n                  \"as\": \"r\"\r\n                }\r\n              ],\r\n              \"sort\": [\r\n                {\r\n                  \"field\": \"Avg Price\",\r\n                  \"order\": \"ascending\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"filter\": \"datum.r == 1\"\r\n            },\r\n            {\r\n              \"calculate\": \"''Lowest: '' + datum.room + '' '' + format(datum[''Avg Price''], ''$,.0f'')\",\r\n              \"as\": \"t\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"t\"\r\n            }\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"width\": 260,\r\n      \"height\": 130,\r\n      \"encoding\": {\r\n        \"y\": {\r\n          \"field\": \"room\",\r\n          \"type\": \"nominal\",\r\n          \"title\": null,\r\n          \"axis\": {\r\n            \"domain\": false,\r\n            \"ticks\": false,\r\n            \"labelColor\": \"#6B6255\",\r\n            \"labelFontSize\": 11,\r\n            \"labelPadding\": 6\r\n          },\r\n          \"sort\": \"-x\"\r\n        },\r\n        \"x\": {\r\n          \"field\": \"Avg Price\",\r\n          \"type\": \"quantitative\",\r\n          \"axis\": null,\r\n          \"scale\": {\r\n            \"nice\": false\r\n          }\r\n        }\r\n      },\r\n      \"layer\": [\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"bar\",\r\n            \"cornerRadiusEnd\": 4,\r\n            \"height\": {\r\n              \"band\": 0.6\r\n            }\r\n          },\r\n          \"encoding\": {\r\n            \"color\": {\r\n              \"condition\": {\r\n                \"test\": \"datum.r_price == 1\",\r\n                \"value\": \"#F2B632\"\r\n              },\r\n              \"value\": \"#14617E\"\r\n            },\r\n            \"tooltip\": [\r\n              {\r\n                \"field\": \"room\",\r\n                \"title\": \"Room type\"\r\n              },\r\n              {\r\n                \"field\": \"Avg Price\",\r\n                \"title\": \"Avg price\",\r\n                \"format\": \"$,.2f\"\r\n              },\r\n              {\r\n                \"field\": \"Total Listings\",\r\n                \"title\": \"Listings\",\r\n                \"format\": \",\"\r\n              }\r\n            ]\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"dx\": 4,\r\n            \"fontSize\": 11,\r\n            \"color\": \"#6B6255\"\r\n          },\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"Avg Price\",\r\n              \"format\": \"$,.0f\"\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"transform\": [\r\n            {\r\n              \"joinaggregate\": [\r\n                {\r\n                  \"op\": \"max\",\r\n                  \"field\": \"Avg Price\",\r\n                  \"as\": \"mx\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"calculate\": \"datum.mx * 1.25\",\r\n              \"as\": \"pad\"\r\n            }\r\n          ],\r\n          \"mark\": {\r\n            \"type\": \"point\",\r\n            \"opacity\": 0\r\n          },\r\n          \"encoding\": {\r\n            \"x\": {\r\n              \"field\": \"pad\",\r\n              \"type\": \"quantitative\"\r\n            }\r\n          }\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"spacing\": 16,\r\n  \"config\": {\r\n    \"view\": {\r\n      \"stroke\": null\r\n    },\r\n    \"font\": \"Segoe UI\"\r\n  }\r\n}'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.3'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "supportFieldConfiguration": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\"Year\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Total Reviews\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false}}'"
+                }
+              }
+            },
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "consolidateFieldParameters": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "160D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "582D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "angle": {
+              "expr": {
+                "Literal": {
+                  "Value": "45L"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "3L"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "70L"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

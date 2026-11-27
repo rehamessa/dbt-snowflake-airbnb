@@ -1,0 +1,211 @@
+table _Measures
+	lineageTag: 7c791ee2-3dd1-4c2d-b59b-062eb656728c
+
+	measure 'Total Reviews' = COUNTROWS(Fact_Reviews)
+		formatString: #,0
+		lineageTag: 753ff3b8-1c25-4a28-b18c-383a8bf93571
+
+	measure 'Total Listings' = COUNTROWS(Dim_Listings)
+		formatString: #,0
+		lineageTag: 68629bb8-be7e-4551-b709-5f18f340ef9c
+
+	measure 'Total Hosts' = COUNTROWS(Dim_Hosts)
+		formatString: #,0
+		lineageTag: 9c753291-b51e-4a3c-a274-738e85060400
+
+	measure 'Avg Price' = AVERAGE(Dim_Listings[PRICE])
+		formatString: \$#,0.0;(\$#,0.0);\$#,0.0
+		lineageTag: 2d15fe2a-0c9c-4539-bd74-ebb26beb2efc
+
+	measure 'Positive %' = DIVIDE(CALCULATE([Total Reviews], Fact_Reviews[REVIEW_SENTIMENT] = "positive"), [Total Reviews])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: b9815acb-b0b6-476e-a501-9368369a144f
+
+	measure 'Negative %' = DIVIDE(CALCULATE([Total Reviews], Fact_Reviews[REVIEW_SENTIMENT] = "negative"), [Total Reviews])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a1253144-e968-4a1f-a4a1-84e73917d064
+
+	measure 'Reviews YoY %' =
+			
+			VAR ReviewsThisYear = [Total Reviews]
+			VAR ReviewsLastYear = CALCULATE([Total Reviews], SAMEPERIODLASTYEAR(DimDate[Date]))
+			RETURN DIVIDE(ReviewsThisYear - ReviewsLastYear, ReviewsLastYear)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a746f001-c9b7-4806-816b-184bb2031101
+
+	measure 'Superhost %' = DIVIDE(CALCULATE([Total Hosts], Dim_Hosts[HOST_STATUS] = "superhost"), [Total Hosts])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 51f99af5-4653-47ca-95d0-33109281d9a6
+
+	measure 'Large Hosts Share of Listings' =
+			
+			DIVIDE(
+			    CALCULATE(SUM(Dim_Hosts[TOTAL_LISTINGS]), Dim_Hosts[PORTFOLIO_SIZE] = "large_portfolio"),
+			    SUM(Dim_Hosts[TOTAL_LISTINGS])
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 12289a44-b65a-4469-874c-d6221cfff200
+
+	measure 'HTML Hero' =
+			
+			VAR _FirstYear = YEAR(MIN(Fact_Reviews[REVIEW_DATE]))
+			VAR _LastYear  = MAXX(FILTER(VALUES(DimDate[Year]), CALCULATE([Total Reviews]) > 10), DimDate[Year])
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;background:linear-gradient(135deg,#FFF8EC 0%,#F7E7C6 100%);border:1px solid #E9D8B4;border-radius:16px;padding:14px 24px 14px 84px;height:100%;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:center;'>" &
+			    "<div style='font-size:24px;font-weight:600;color:#172541;line-height:1.2;'>Airbnb: Market &amp; Guest Experience</div>" &
+			    "<div style='font-size:13px;color:#6B6255;margin-top:2px;'>" & _FirstYear & "–" & _LastYear & " · Snowflake → dbt (tested &amp; documented) → Power BI</div>" &
+			"</div>"
+		lineageTag: 1efe538d-459f-425c-966b-bc63698ba02e
+
+	measure 'Ctx Positive' =
+			
+			VAR _Years = FILTER(VALUES(DimDate[Year]), [Total Reviews] > 1000)
+			VAR _Best  = TOPN(1, _Years, [Positive %], DESC)
+			VAR _Worst = TOPN(1, _Years, [Positive %], ASC)
+			RETURN
+			"Best " & MAXX(_Best, DimDate[Year]) & ": " & FORMAT(MAXX(_Best, [Positive %]), "0%") &
+			" · Lowest " & MAXX(_Worst, DimDate[Year]) & ": " & FORMAT(MAXX(_Worst, [Positive %]), "0%")
+		lineageTag: 7690eb64-cc5f-461d-a153-83ce2e724870
+
+	measure 'Ctx Negative' =
+			
+			VAR _Years = FILTER(VALUES(DimDate[Year]), [Total Reviews] > 1000)
+			VAR _High  = TOPN(1, _Years, [Negative %], DESC)
+			VAR _Low   = TOPN(1, _Years, [Negative %], ASC)
+			RETURN
+			"Highest " & MAXX(_High, DimDate[Year]) & ": " & FORMAT(MAXX(_High, [Negative %]), "0.0%") &
+			" · Lowest " & MAXX(_Low, DimDate[Year]) & ": " & FORMAT(MAXX(_Low, [Negative %]), "0.0%")
+		lineageTag: 5c635722-29ca-4bf0-af0a-80bc46f1cd4f
+
+	measure 'Ctx Listings' =
+			
+			VAR _Entire  = DIVIDE(CALCULATE([Total Listings], Dim_Listings[ROOM_TYPE] = "Entire home/apt"), [Total Listings])
+			VAR _Private = DIVIDE(CALCULATE([Total Listings], Dim_Listings[ROOM_TYPE] = "Private room"), [Total Listings])
+			RETURN FORMAT(_Entire, "0%") & " entire homes · " & FORMAT(_Private, "0%") & " private rooms"
+		lineageTag: 7dce6367-6fbe-42fd-aaf9-7d04c315a591
+
+	measure Measure
+		lineageTag: 3fed0ce1-510a-4fa3-be24-2b766b93a383
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure 'Ctx Price' =
+			
+			"Median " & FORMAT(MEDIAN(Dim_Listings[PRICE]), "$#,0") &
+			" · Entire home " & FORMAT(CALCULATE([Avg Price], Dim_Listings[ROOM_TYPE] = "Entire home/apt"), "$#,0")
+		lineageTag: 3686f748-fa7a-4b21-8050-f0baf7c706fd
+
+	measure 'Ctx Hosts' =
+			
+			VAR _Single = DIVIDE(CALCULATE([Total Hosts], Dim_Hosts[PORTFOLIO_SIZE] = "single_listing"), [Total Hosts])
+			VAR _Large  = CALCULATE([Total Hosts], Dim_Hosts[PORTFOLIO_SIZE] = "large_portfolio")
+			RETURN FORMAT(_Single, "0%") & " own 1 listing · " & _Large & " own 16+"
+		lineageTag: 564ffa68-210e-42f9-936e-c69ec58fe234
+
+	measure 'Positive Rate' = [Positive %]
+		lineageTag: 800342ab-59b4-4e51-97cc-b0003bf00f74
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Negative Rate' = [Negative %]
+		lineageTag: 5ae4b294-4f26-4938-90e8-c7512e039b09
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Listings Share' =
+			
+			DIVIDE(
+			    SUM(Dim_Hosts[TOTAL_LISTINGS]),
+			    CALCULATE(SUM(Dim_Hosts[TOTAL_LISTINGS]), ALL(Dim_Hosts[PORTFOLIO_SIZE]))
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 409782b5-6e49-43eb-a582-5ac1781c8420
+
+	measure 'HTML Top Hosts' =
+			
+			VAR _Top =
+			    TOPN(10, Dim_Hosts, Dim_Hosts[TOTAL_LISTINGS], DESC, Dim_Hosts[HOST_ID], ASC)
+			VAR _Max      = MAXX(_Top, Dim_Hosts[TOTAL_LISTINGS])
+			VAR _TopTotal = SUMX(_Top, Dim_Hosts[TOTAL_LISTINGS])
+			VAR _AllTotal = SUM(Dim_Hosts[TOTAL_LISTINGS])
+			VAR _TopShare = DIVIDE(_TopTotal, _AllTotal)
+			
+			VAR _Rows =
+			    CONCATENATEX(
+			        _Top,
+			        VAR _Cur   = Dim_Hosts[TOTAL_LISTINGS]
+			        VAR _Rank  = COUNTROWS(FILTER(_Top, Dim_Hosts[TOTAL_LISTINGS] > _Cur)) + 1
+			        VAR _Name  = SUBSTITUTE(SUBSTITUTE(Dim_Hosts[HOST_NAME], "&", "&amp;"), "<", "&lt;")
+			        VAR _Super = Dim_Hosts[HOST_STATUS] = "superhost"
+			        VAR _Pct   = FORMAT(DIVIDE(_Cur, _Max) * 100, "0")
+			        VAR _Bar   = IF(_Rank = 1, "#F2B632", "#14617E")
+			        RETURN
+			            "<div style='display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F1EADB;'>" &
+			                "<div style='width:20px;font-size:12px;font-weight:600;color:#B8860B;'>" & _Rank & "</div>" &
+			                "<div style='width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;'>" &
+			                    "<div style='font-size:13px;font-weight:600;color:#172541;overflow:hidden;text-overflow:ellipsis;'>" & _Name & "</div>" &
+			                    "<div style='font-size:11px;color:#8A7F6E;'>" &
+			                        IF(_Super, "<span style='color:#B8860B;'>&#9733; Superhost</span> &middot; ", "") &
+			                        FORMAT(Dim_Hosts[AVG_LISTING_PRICE], "$#,0") & " avg" &
+			                    "</div>" &
+			                "</div>" &
+			                "<div style='flex:1;background:#F1EADB;border-radius:6px;height:10px;'>" &
+			                    "<div style='width:" & _Pct & "%;background:" & _Bar & ";height:10px;border-radius:6px;'></div>" &
+			                "</div>" &
+			                "<div style='width:36px;text-align:right;font-size:13px;font-weight:600;color:#14617E;'>" & _Cur & "</div>" &
+			            "</div>",
+			        "",
+			        Dim_Hosts[TOTAL_LISTINGS], DESC,
+			        Dim_Hosts[HOST_ID], ASC
+			    )
+			
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;padding:16px 20px;box-sizing:border-box;'>" &
+			    "<div style='font-size:11px;letter-spacing:2px;color:#B8860B;font-weight:600;'>TOP 10 HOSTS</div>" &
+			    "<div style='font-size:20px;font-weight:600;color:#172541;margin-top:2px;'>The biggest hosts are still small</div>" &
+			    "<div style='font-size:12px;color:#6B6255;margin:4px 0 10px;'>Together they list <b>" & FORMAT(_TopTotal, "#,0") & "</b> places, only <b>" & FORMAT(_TopShare, "0.0%") & "</b> of all listings.</div>" &
+			    _Rows &
+			"</div>"
+		lineageTag: 8eb59e6c-3d51-4476-a74f-983a02d78b2d
+
+	measure 'Host Listings' = SUM(Dim_Hosts[TOTAL_LISTINGS])
+		formatString: #,0.00
+		lineageTag: 5c3fe54d-618a-4b50-93d3-b47b432f54c6
+
+	measure 'HTML Header Hosts' =
+			
+			VAR _Hosts   = COUNTROWS(Dim_Hosts)
+			VAR _Single  = DIVIDE(COUNTROWS(FILTER(Dim_Hosts, Dim_Hosts[TOTAL_LISTINGS] = 1)), _Hosts)
+			VAR _Super   = DIVIDE(COUNTROWS(FILTER(Dim_Hosts, Dim_Hosts[HOST_STATUS] = "superhost")), _Hosts)
+			VAR _Chip = "display:inline-block;margin-left:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.75);border:1px solid #E9D8B4;font-size:12px;color:#6B6255;"
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;height:84px;box-sizing:border-box;padding:0 24px 0 84px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;background:linear-gradient(90deg, #FFFFFF 0%, #FBF3E0 55%, #F3DFA9 100%);'>" &
+			    "<div>" &
+			        "<div style='font-size:20px;font-weight:600;color:#172541;'>Hosts &amp; Pricing</div>" &
+			        "<div style='font-size:12px;color:#8A7F6E;margin-top:2px;'>Who lists on Airbnb, and how host size and status shape the price</div>" &
+			    "</div>" &
+			    "<div style='white-space:nowrap;'>" &
+			        "<span style='" & _Chip & "'><b style='color:#14617E;'>" & FORMAT(_Hosts, "#,0") & "</b> hosts</span>" &
+			        "<span style='" & _Chip & "'><b style='color:#14617E;'>" & FORMAT(_Single, "0%") & "</b> list one place</span>" &
+			        "<span style='" & _Chip & "'><b style='color:#B8860B;'>&#9733; " & FORMAT(_Super, "0%") & "</b> superhosts</span>" &
+			    "</div>" &
+			"</div>"
+		lineageTag: 6d8bfb3e-ee47-49ab-914e-04f6fa641570
+
+	column Column
+		formatString: 0
+		lineageTag: 209c5db8-d55b-4e69-a768-c673bf4cdd72
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 820f7aa486c4445183757317fb02fbd5
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

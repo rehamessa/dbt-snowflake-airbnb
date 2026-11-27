@@ -1,0 +1,270 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "3b7f48401795f40c1fcc",
+  "position": {
+    "x": 24.12881267181568,
+    "y": 314.15717044115723,
+    "z": 4000,
+    "height": 186,
+    "width": 608,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimDate"
+                    }
+                  },
+                  "Property": "Year"
+                }
+              },
+              "queryRef": "Sum(DimDate.Year)",
+              "nativeQueryRef": "Year"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Total Reviews"
+                }
+              },
+              "queryRef": "_Measures.Total Reviews",
+              "nativeQueryRef": "Total Reviews"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Negative Rate"
+                }
+              },
+              "queryRef": "_Measures.Negative Rate",
+              "nativeQueryRef": "Negative Rate"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimDate"
+                  }
+                },
+                "Property": "Year"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\r\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\r\n  \"data\": {\r\n    \"name\": \"dataset\"\r\n  },\r\n  \"transform\": [\r\n    {\r\n      \"calculate\": \"datum[''Negative Rate''] * datum[''Total Reviews'']\",\r\n      \"as\": \"neg_count\"\r\n    }\r\n  ],\r\n  \"hconcat\": [\r\n    {\r\n      \"width\": 190,\r\n      \"height\": 130,\r\n      \"layer\": [\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 0,\r\n            \"fontSize\": 11,\r\n            \"color\": \"#8A7F6E\",\r\n            \"text\": \"NEGATIVE REVIEWS\",\r\n            \"letterSpacing\": 1.5\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"aggregate\": [\r\n                {\r\n                  \"op\": \"count\",\r\n                  \"as\": \"n\"\r\n                }\r\n              ]\r\n            }\r\n          ]\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 22,\r\n            \"fontSize\": 34,\r\n            \"color\": \"#AD2F4B\",\r\n            \"fontWeight\": 600\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"aggregate\": [\r\n                {\r\n                  \"op\": \"sum\",\r\n                  \"field\": \"neg_count\",\r\n                  \"as\": \"p\"\r\n                },\r\n                {\r\n                  \"op\": \"sum\",\r\n                  \"field\": \"Total Reviews\",\r\n                  \"as\": \"t\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"calculate\": \"datum.p / datum.t\",\r\n              \"as\": \"rate\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"rate\",\r\n              \"format\": \".1%\"\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 76,\r\n            \"fontSize\": 12,\r\n            \"color\": \"#AD2F4B\",\r\n            \"fontWeight\": 600\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"filter\": \"datum[''Total Reviews''] > 1000\"\r\n            },\r\n            {\r\n              \"joinaggregate\": [\r\n                {\r\n                  \"op\": \"max\",\r\n                  \"field\": \"Negative Rate\",\r\n                  \"as\": \"hi\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"filter\": \"datum[''Negative Rate''] == datum.hi\"\r\n            },\r\n            {\r\n              \"calculate\": \"''Highest '' + datum.Year + '': '' + format(datum[''Negative Rate''], ''.1%'')\",\r\n              \"as\": \"t\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"t\"\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"text\",\r\n            \"align\": \"left\",\r\n            \"baseline\": \"top\",\r\n            \"x\": 0,\r\n            \"y\": 96,\r\n            \"fontSize\": 12,\r\n            \"color\": \"#6B6255\"\r\n          },\r\n          \"transform\": [\r\n            {\r\n              \"filter\": \"datum[''Total Reviews''] > 1000\"\r\n            },\r\n            {\r\n              \"joinaggregate\": [\r\n                {\r\n                  \"op\": \"min\",\r\n                  \"field\": \"Negative Rate\",\r\n                  \"as\": \"lo\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"filter\": \"datum[''Negative Rate''] == datum.lo\"\r\n            },\r\n            {\r\n              \"calculate\": \"''Lowest '' + datum.Year + '': '' + format(datum[''Negative Rate''], ''.1%'')\",\r\n              \"as\": \"t\"\r\n            }\r\n          ],\r\n          \"encoding\": {\r\n            \"text\": {\r\n              \"field\": \"t\"\r\n            }\r\n          }\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"width\": 340,\r\n      \"height\": 130,\r\n      \"transform\": [\r\n        {\r\n          \"filter\": \"datum[''Total Reviews''] > 1000\"\r\n        }\r\n      ],\r\n      \"encoding\": {\r\n        \"x\": {\r\n          \"field\": \"Year\",\r\n          \"type\": \"ordinal\",\r\n          \"axis\": {\r\n            \"title\": null,\r\n            \"labelAngle\": 0,\r\n            \"domain\": false,\r\n            \"ticks\": false,\r\n            \"labelColor\": \"#8A7F6E\",\r\n            \"labelFontSize\": 10,\r\n            \"labelExpr\": \"\\\"''\\\" + substring(datum.label, 2)\"\r\n          }\r\n        },\r\n        \"y\": {\r\n          \"field\": \"Negative Rate\",\r\n          \"type\": \"quantitative\",\r\n          \"scale\": {\r\n            \"zero\": false\r\n          },\r\n          \"axis\": null\r\n        }\r\n      },\r\n      \"layer\": [\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"area\",\r\n            \"interpolate\": \"monotone\",\r\n            \"color\": {\r\n              \"x1\": 0,\r\n              \"y1\": 0,\r\n              \"x2\": 0,\r\n              \"y2\": 1,\r\n              \"gradient\": \"linear\",\r\n              \"stops\": [\r\n                {\r\n                  \"offset\": 0,\r\n                  \"color\": \"rgba(173,47,75,0.35)\"\r\n                },\r\n                {\r\n                  \"offset\": 1,\r\n                  \"color\": \"rgba(173,47,75,0)\"\r\n                }\r\n              ]\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"line\",\r\n            \"interpolate\": \"monotone\",\r\n            \"strokeWidth\": 3,\r\n            \"color\": {\r\n              \"x1\": 0,\r\n              \"y1\": 0,\r\n              \"x2\": 1,\r\n              \"y2\": 0,\r\n              \"gradient\": \"linear\",\r\n              \"stops\": [\r\n                {\r\n                  \"offset\": 0,\r\n                  \"color\": \"#E8833A\"\r\n                },\r\n                {\r\n                  \"offset\": 1,\r\n                  \"color\": \"#AD2F4B\"\r\n                }\r\n              ]\r\n            }\r\n          }\r\n        },\r\n        {\r\n          \"transform\": [\r\n            {\r\n              \"window\": [\r\n                {\r\n                  \"op\": \"rank\",\r\n                  \"as\": \"r\"\r\n                }\r\n              ],\r\n              \"sort\": [\r\n                {\r\n                  \"field\": \"Year\",\r\n                  \"order\": \"descending\"\r\n                }\r\n              ]\r\n            },\r\n            {\r\n              \"filter\": \"datum.r == 1\"\r\n            }\r\n          ],\r\n          \"mark\": {\r\n            \"type\": \"point\",\r\n            \"filled\": true,\r\n            \"size\": 70,\r\n            \"color\": \"#F2B632\",\r\n            \"stroke\": \"#FFFFFF\",\r\n            \"strokeWidth\": 2\r\n          }\r\n        },\r\n        {\r\n          \"mark\": {\r\n            \"type\": \"point\",\r\n            \"opacity\": 0,\r\n            \"size\": 200\r\n          },\r\n          \"encoding\": {\r\n            \"tooltip\": [\r\n              {\r\n                \"field\": \"Year\"\r\n              },\r\n              {\r\n                \"field\": \"Negative Rate\",\r\n                \"title\": \"Negative\",\r\n                \"format\": \".1%\"\r\n              },\r\n              {\r\n                \"field\": \"Total Reviews\",\r\n                \"title\": \"Reviews\",\r\n                \"format\": \",\"\r\n              }\r\n            ]\r\n          }\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"spacing\": 16,\r\n  \"config\": {\r\n    \"view\": {\r\n      \"stroke\": null\r\n    },\r\n    \"font\": \"Segoe UI\"\r\n  }\r\n}'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.3'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "supportFieldConfiguration": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\"Year\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Total Reviews\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false}}'"
+                }
+              }
+            },
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "consolidateFieldParameters": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "160D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "582D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "angle": {
+              "expr": {
+                "Literal": {
+                  "Value": "45L"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "3L"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "70L"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
