@@ -1,0 +1,340 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.15.0/schema.json",
+  "name": "0ffa2307642ed5c34250",
+  "position": {
+    "x": 440.3508312606362,
+    "y": 107.16715070819795,
+    "z": 2000,
+    "height": 329.358292970284,
+    "width": 816.76030894096084,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "unique_id"
+                }
+              },
+              "queryRef": "dbt_Run_Results.unique_id",
+              "nativeQueryRef": "unique_id"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "Node Name"
+                }
+              },
+              "queryRef": "dbt_Run_Results.Node Name",
+              "nativeQueryRef": "Node Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "Resource Type"
+                }
+              },
+              "queryRef": "dbt_Run_Results.Resource Type",
+              "nativeQueryRef": "Resource Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "status"
+                }
+              },
+              "queryRef": "dbt_Run_Results.status",
+              "nativeQueryRef": "status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "Thread"
+                }
+              },
+              "queryRef": "dbt_Run_Results.Thread",
+              "nativeQueryRef": "Thread"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "Started At"
+                }
+              },
+              "queryRef": "dbt_Run_Results.Started At",
+              "nativeQueryRef": "Started At"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "Completed At"
+                }
+              },
+              "queryRef": "dbt_Run_Results.Completed At",
+              "nativeQueryRef": "Completed At"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dbt_Run_Results"
+                    }
+                  },
+                  "Property": "execution_time"
+                }
+              },
+              "queryRef": "Sum(dbt_Run_Results.execution_time)",
+              "nativeQueryRef": "execution_time"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dbt_Run_Results"
+                  }
+                },
+                "Property": "unique_id"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "vega": [
+        {
+          "properties": {
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\r\n  \"$schema\": \"https://vega.github.io/schema/vega-lite/v5.json\",\r\n  \"data\": {\r\n    \"name\": \"dataset\"\r\n  },\r\n  \"title\": {\r\n    \"text\": \"Inside the dbt build: 4 threads, one slow Python model\",\r\n    \"subtitle\": \"Each bar is a model, snapshot, seed or test, from start to finish (seconds since the build started)\",\r\n    \"anchor\": \"start\",\r\n    \"color\": \"#172541\",\r\n    \"fontSize\": 15,\r\n    \"fontWeight\": 600,\r\n    \"subtitleColor\": \"#8A7F6E\",\r\n    \"subtitleFontSize\": 11,\r\n    \"offset\": 10\r\n  },\r\n  \"width\": 720,\r\n  \"height\": 200,\r\n  \"transform\": [\r\n    {\r\n      \"filter\": \"datum[''Thread''] != ''main'' && datum[''Started At''] != null && datum[''Completed At''] != null\"\r\n    },\r\n    {\r\n      \"calculate\": \"time(toDate(datum[''Started At'']))\",\r\n      \"as\": \"s_ms\"\r\n    },\r\n    {\r\n      \"calculate\": \"time(toDate(datum[''Completed At'']))\",\r\n      \"as\": \"e_ms\"\r\n    },\r\n    {\r\n      \"joinaggregate\": [\r\n        {\r\n          \"op\": \"min\",\r\n          \"field\": \"s_ms\",\r\n          \"as\": \"t0\"\r\n        }\r\n      ]\r\n    },\r\n    {\r\n      \"calculate\": \"(datum.s_ms - datum.t0) / 1000\",\r\n      \"as\": \"start_s\"\r\n    },\r\n    {\r\n      \"calculate\": \"max((datum.e_ms - datum.t0) / 1000, datum.start_s + 0.4)\",\r\n      \"as\": \"end_s\"\r\n    },\r\n    {\r\n      \"calculate\": \"datum[''status''] == ''warn'' ? ''warning'' : (datum[''status''] == ''fail'' || datum[''status''] == ''error'') ? ''failed'' : datum[''Resource Type''] == ''unit_test'' ? ''test'' : datum[''Resource Type'']\",\r\n      \"as\": \"kind\"\r\n    },\r\n    {\r\n      \"calculate\": \"''Thread '' + replace(datum[''Thread''], ''Thread-'', '''')\",\r\n      \"as\": \"lane\"\r\n    }\r\n  ],\r\n  \"encoding\": {\r\n    \"y\": {\r\n      \"field\": \"lane\",\r\n      \"type\": \"nominal\",\r\n      \"title\": null,\r\n      \"sort\": \"ascending\",\r\n      \"axis\": {\r\n        \"domain\": false,\r\n        \"ticks\": false,\r\n        \"labelColor\": \"#8A7F6E\",\r\n        \"labelFontSize\": 11,\r\n        \"labelPadding\": 8\r\n      }\r\n    },\r\n    \"x\": {\r\n      \"field\": \"start_s\",\r\n      \"type\": \"quantitative\",\r\n      \"title\": \"Seconds since build start\",\r\n      \"scale\": {\r\n        \"domainMin\": 0,\r\n        \"nice\": true\r\n      },\r\n      \"axis\": {\r\n        \"domain\": false,\r\n        \"ticks\": false,\r\n        \"gridColor\": \"#F1EADB\",\r\n        \"labelColor\": \"#8A7F6E\",\r\n        \"titleColor\": \"#8A7F6E\",\r\n        \"titleFontWeight\": \"normal\",\r\n        \"titleFontSize\": 11,\r\n        \"labelFontSize\": 10,\r\n        \"tickCount\": 8\r\n      }\r\n    }\r\n  },\r\n  \"layer\": [\r\n    {\r\n      \"mark\": {\r\n        \"type\": \"bar\",\r\n        \"cornerRadius\": 3,\r\n        \"height\": {\r\n          \"band\": 0.62\r\n        },\r\n        \"stroke\": \"#FFFFFF\",\r\n        \"strokeWidth\": 1\r\n      },\r\n      \"encoding\": {\r\n        \"x2\": {\r\n          \"field\": \"end_s\"\r\n        },\r\n        \"color\": {\r\n          \"field\": \"kind\",\r\n          \"type\": \"nominal\",\r\n          \"title\": null,\r\n          \"scale\": {\r\n            \"domain\": [\r\n              \"model\",\r\n              \"snapshot\",\r\n              \"seed\",\r\n              \"test\",\r\n              \"warning\",\r\n              \"failed\"\r\n            ],\r\n            \"range\": [\r\n              \"#14617E\",\r\n              \"#F2B632\",\r\n              \"#B8860B\",\r\n              \"#A9CCD8\",\r\n              \"#E8833A\",\r\n              \"#AD2F4B\"\r\n            ]\r\n          },\r\n          \"legend\": {\r\n            \"orient\": \"bottom\",\r\n            \"direction\": \"horizontal\",\r\n            \"symbolType\": \"square\",\r\n            \"labelColor\": \"#8A7F6E\",\r\n            \"labelFontSize\": 11,\r\n            \"offset\": 6\r\n          }\r\n        },\r\n        \"tooltip\": [\r\n          {\r\n            \"field\": \"Node Name\",\r\n            \"title\": \"Node\"\r\n          },\r\n          {\r\n            \"field\": \"kind\",\r\n            \"title\": \"Type\"\r\n          },\r\n          {\r\n            \"field\": \"status\",\r\n            \"title\": \"Status\"\r\n          },\r\n          {\r\n            \"field\": \"execution_time\",\r\n            \"title\": \"Seconds\",\r\n            \"format\": \".1f\"\r\n          }\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"transform\": [\r\n        {\r\n          \"filter\": \"datum.end_s - datum.start_s > 30\"\r\n        },\r\n        {\r\n          \"calculate\": \"datum[''Node Name''] + ''  ·  '' + format(datum.execution_time, ''.0f'') + ''s''\",\r\n          \"as\": \"lbl\"\r\n        }\r\n      ],\r\n      \"mark\": {\r\n        \"type\": \"text\",\r\n        \"align\": \"left\",\r\n        \"dx\": 8,\r\n        \"fontSize\": 11,\r\n        \"fontWeight\": 600,\r\n        \"color\": \"#FFFFFF\"\r\n      },\r\n      \"encoding\": {\r\n        \"text\": {\r\n          \"field\": \"lbl\"\r\n        }\r\n      }\r\n    }\r\n  ],\r\n  \"config\": {\r\n    \"view\": {\r\n      \"stroke\": null\r\n    },\r\n    \"font\": \"Segoe UI\"\r\n  }\r\n}'"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.4.3'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "stateManagement": [
+        {
+          "properties": {
+            "supportFieldConfiguration": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\"Year\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":false,\"formatted\":false,\"names\":false},\"Total Reviews\":{\"highlight\":false,\"highlightStatus\":false,\"highlightComparator\":false,\"format\":true,\"formatted\":true,\"names\":false}}'"
+                }
+              }
+            },
+            "denebMetaVersion": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2'"
+                }
+              }
+            },
+            "consolidateFieldParameters": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "303D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "791D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'2.0.1.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "angle": {
+              "expr": {
+                "Literal": {
+                  "Value": "45L"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "10L"
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "3L"
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "70L"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "padding": [
+        {
+          "properties": {
+            "top": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "left": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "bottom": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "right": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

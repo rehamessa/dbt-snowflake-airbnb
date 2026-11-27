@@ -12,7 +12,7 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Fact_Reviews","Audit_Log","Dim_Hosts","Dim_Listings"]
+annotation PBI_QueryOrder = ["Fact_Reviews","Audit_Log","Dim_Hosts","Dim_Listings","dbt_Run_Results"]
 
 ref table Fact_Reviews
 ref table Audit_Log
@@ -20,6 +20,7 @@ ref table Dim_Hosts
 ref table Dim_Listings
 ref table DimDate
 ref table _Measures
+ref table dbt_Run_Results
 
 ref cultureInfo en-US
 
