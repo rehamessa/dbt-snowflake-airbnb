@@ -148,6 +148,40 @@ table Dim_Hosts
 
 		annotation SummarizationSetBy = Automatic
 
+	column 'Portfolio Order' =
+			
+			SWITCH(
+			    Dim_Hosts[PORTFOLIO_SIZE],
+			    "single_listing", 1,
+			    "small_portfolio", 2,
+			    "medium_portfolio", 3,
+			    "large_portfolio", 4,
+			    0
+			)
+		formatString: 0
+		lineageTag: 24e6b7b0-2792-47ad-91e0-14a5e0c67b62
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Portfolio Label' =
+			
+			SWITCH(
+			    Dim_Hosts[PORTFOLIO_SIZE],
+			    "single_listing", "1 listing",
+			    "small_portfolio", "2-5",
+			    "medium_portfolio", "6-15",
+			    "large_portfolio", "16+",
+			    "None"
+			)
+		lineageTag: 02a1921d-79f3-4dcb-81fe-accf1b3244ac
+		summarizeBy: none
+		sortByColumn: 'Portfolio Order'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
 	partition Dim_Hosts = m
 		mode: import
 		source =

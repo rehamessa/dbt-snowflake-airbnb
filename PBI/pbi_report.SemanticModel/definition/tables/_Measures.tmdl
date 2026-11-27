@@ -121,6 +121,77 @@ table _Measures
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 409782b5-6e49-43eb-a582-5ac1781c8420
 
+	measure 'HTML Top Hosts' =
+			
+			VAR _Top =
+			    TOPN(10, Dim_Hosts, Dim_Hosts[TOTAL_LISTINGS], DESC, Dim_Hosts[HOST_ID], ASC)
+			VAR _Max      = MAXX(_Top, Dim_Hosts[TOTAL_LISTINGS])
+			VAR _TopTotal = SUMX(_Top, Dim_Hosts[TOTAL_LISTINGS])
+			VAR _AllTotal = SUM(Dim_Hosts[TOTAL_LISTINGS])
+			VAR _TopShare = DIVIDE(_TopTotal, _AllTotal)
+			
+			VAR _Rows =
+			    CONCATENATEX(
+			        _Top,
+			        VAR _Cur   = Dim_Hosts[TOTAL_LISTINGS]
+			        VAR _Rank  = COUNTROWS(FILTER(_Top, Dim_Hosts[TOTAL_LISTINGS] > _Cur)) + 1
+			        VAR _Name  = SUBSTITUTE(SUBSTITUTE(Dim_Hosts[HOST_NAME], "&", "&amp;"), "<", "&lt;")
+			        VAR _Super = Dim_Hosts[HOST_STATUS] = "superhost"
+			        VAR _Pct   = FORMAT(DIVIDE(_Cur, _Max) * 100, "0")
+			        VAR _Bar   = IF(_Rank = 1, "#F2B632", "#14617E")
+			        RETURN
+			            "<div style='display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F1EADB;'>" &
+			                "<div style='width:20px;font-size:12px;font-weight:600;color:#B8860B;'>" & _Rank & "</div>" &
+			                "<div style='width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;'>" &
+			                    "<div style='font-size:13px;font-weight:600;color:#172541;overflow:hidden;text-overflow:ellipsis;'>" & _Name & "</div>" &
+			                    "<div style='font-size:11px;color:#8A7F6E;'>" &
+			                        IF(_Super, "<span style='color:#B8860B;'>&#9733; Superhost</span> &middot; ", "") &
+			                        FORMAT(Dim_Hosts[AVG_LISTING_PRICE], "$#,0") & " avg" &
+			                    "</div>" &
+			                "</div>" &
+			                "<div style='flex:1;background:#F1EADB;border-radius:6px;height:10px;'>" &
+			                    "<div style='width:" & _Pct & "%;background:" & _Bar & ";height:10px;border-radius:6px;'></div>" &
+			                "</div>" &
+			                "<div style='width:36px;text-align:right;font-size:13px;font-weight:600;color:#14617E;'>" & _Cur & "</div>" &
+			            "</div>",
+			        "",
+			        Dim_Hosts[TOTAL_LISTINGS], DESC,
+			        Dim_Hosts[HOST_ID], ASC
+			    )
+			
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;padding:16px 20px;box-sizing:border-box;'>" &
+			    "<div style='font-size:11px;letter-spacing:2px;color:#B8860B;font-weight:600;'>TOP 10 HOSTS</div>" &
+			    "<div style='font-size:20px;font-weight:600;color:#172541;margin-top:2px;'>The biggest hosts are still small</div>" &
+			    "<div style='font-size:12px;color:#6B6255;margin:4px 0 10px;'>Together they list <b>" & FORMAT(_TopTotal, "#,0") & "</b> places, only <b>" & FORMAT(_TopShare, "0.0%") & "</b> of all listings.</div>" &
+			    _Rows &
+			"</div>"
+		lineageTag: 8eb59e6c-3d51-4476-a74f-983a02d78b2d
+
+	measure 'Host Listings' = SUM(Dim_Hosts[TOTAL_LISTINGS])
+		formatString: #,0.00
+		lineageTag: 5c3fe54d-618a-4b50-93d3-b47b432f54c6
+
+	measure 'HTML Header Hosts' =
+			
+			VAR _Hosts   = COUNTROWS(Dim_Hosts)
+			VAR _Single  = DIVIDE(COUNTROWS(FILTER(Dim_Hosts, Dim_Hosts[TOTAL_LISTINGS] = 1)), _Hosts)
+			VAR _Super   = DIVIDE(COUNTROWS(FILTER(Dim_Hosts, Dim_Hosts[HOST_STATUS] = "superhost")), _Hosts)
+			VAR _Chip = "display:inline-block;margin-left:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.75);border:1px solid #E9D8B4;font-size:12px;color:#6B6255;"
+			RETURN
+			"<div style='font-family:Segoe UI, sans-serif;height:84px;box-sizing:border-box;padding:0 24px 0 84px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;background:linear-gradient(90deg, #FFFFFF 0%, #FBF3E0 55%, #F3DFA9 100%);'>" &
+			    "<div>" &
+			        "<div style='font-size:20px;font-weight:600;color:#172541;'>Hosts &amp; Pricing</div>" &
+			        "<div style='font-size:12px;color:#8A7F6E;margin-top:2px;'>Who lists on Airbnb, and how host size and status shape the price</div>" &
+			    "</div>" &
+			    "<div style='white-space:nowrap;'>" &
+			        "<span style='" & _Chip & "'><b style='color:#14617E;'>" & FORMAT(_Hosts, "#,0") & "</b> hosts</span>" &
+			        "<span style='" & _Chip & "'><b style='color:#14617E;'>" & FORMAT(_Single, "0%") & "</b> list one place</span>" &
+			        "<span style='" & _Chip & "'><b style='color:#B8860B;'>&#9733; " & FORMAT(_Super, "0%") & "</b> superhosts</span>" &
+			    "</div>" &
+			"</div>"
+		lineageTag: 6d8bfb3e-ee47-49ab-914e-04f6fa641570
+
 	column Column
 		formatString: 0
 		lineageTag: 209c5db8-d55b-4e69-a768-c673bf4cdd72
