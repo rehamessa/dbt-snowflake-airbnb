@@ -3,6 +3,21 @@
   "name": "d5acd08458d26f40dc2b",
   "displayName": "Page 1",
   "displayOption": "FitToPage",
-  "height": 1080,
-  "width": 1920
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "displayArea": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
 }

@@ -48,45 +48,78 @@ table _Measures
 
 	measure 'HTML Hero' =
 			
-			VAR _Listings  = FORMAT([Total Listings], "#,0")
-			VAR _Hosts     = FORMAT([Total Hosts], "#,0")
-			VAR _Reviews   = FORMAT([Total Reviews] / 1000, "#,0.0") & "K"
-			VAR _Price     = FORMAT([Avg Price], "$#,0")
-			
-			VAR _EntireHomePct =
-			    FORMAT(DIVIDE(CALCULATE(COUNTROWS(Dim_Listings), Dim_Listings[ROOM_TYPE] = "Entire home/apt"), COUNTROWS(Dim_Listings)), "0%")
-			VAR _SingleHostPct =
-			    FORMAT(DIVIDE(CALCULATE(COUNTROWS(Dim_Hosts), Dim_Hosts[PORTFOLIO_SIZE] = "single_listing"), COUNTROWS(Dim_Hosts)), "0%")
-			VAR _PositivePct = FORMAT([Positive %], "0%")
-			VAR _MedianPrice = FORMAT(MEDIAN(Dim_Listings[PRICE]), "$#,0")
-			
 			VAR _FirstYear = YEAR(MIN(Fact_Reviews[REVIEW_DATE]))
 			VAR _LastYear  = MAXX(FILTER(VALUES(DimDate[Year]), CALCULATE([Total Reviews]) > 10), DimDate[Year])
-			
-			VAR _Card =
-			    "<div style='flex:1;background:#FFFFFF;border-radius:12px;padding:14px 18px;border-top:4px solid #F2B632;box-shadow:0 2px 6px rgba(23,37,65,0.06);'>" &
-			        "<div style='font-size:11px;letter-spacing:1.5px;color:#8A7F6E;text-transform:uppercase;'>{l}</div>" &
-			        "<div style='font-size:32px;font-weight:600;color:#14617E;line-height:1.15;margin-top:2px;'>{v}</div>" &
-			        "<div style='font-size:12px;color:#6B6255;margin-top:4px;'>{s}</div>" &
-			    "</div>"
-			
 			RETURN
-			"<div style='font-family:Segoe UI, sans-serif;background:linear-gradient(135deg,#FFF8EC 0%,#F7E7C6 100%);border:1px solid #E9D8B4;border-radius:16px;padding:20px 24px;height:100%;box-sizing:border-box;overflow:hidden;'>" &
-			
-			    "<div style='padding-left:72px;min-height:56px;'>" &
-			        "<div style='font-size:26px;font-weight:600;color:#172541;line-height:1.2;'>Airbnb: Market &amp; Guest Experience</div>" &
-			        "<div style='font-size:13px;color:#6B6255;margin-top:2px;'>" & _FirstYear & "–" & _LastYear & " · Snowflake → dbt (tested &amp; documented) → Power BI</div>" &
-			    "</div>" &
-			
-			    "<div style='display:flex;gap:14px;margin-top:16px;'>" &
-			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Listings"),          "{v}", _Listings), "{s}", _EntireHomePct & " are entire homes") &
-			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Hosts"),             "{v}", _Hosts),    "{s}", _SingleHostPct & " own a single listing") &
-			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Reviews"),           "{v}", _Reviews),  "{s}", _PositivePct & " positive") &
-			        SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(_Card, "{l}", "Avg nightly price"), "{v}", _Price),    "{s}", "Median " & _MedianPrice) &
-			    "</div>" &
-			
+			"<div style='font-family:Segoe UI, sans-serif;background:linear-gradient(135deg,#FFF8EC 0%,#F7E7C6 100%);border:1px solid #E9D8B4;border-radius:16px;padding:14px 24px 14px 84px;height:100%;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:center;'>" &
+			    "<div style='font-size:24px;font-weight:600;color:#172541;line-height:1.2;'>Airbnb: Market &amp; Guest Experience</div>" &
+			    "<div style='font-size:13px;color:#6B6255;margin-top:2px;'>" & _FirstYear & "–" & _LastYear & " · Snowflake → dbt (tested &amp; documented) → Power BI</div>" &
 			"</div>"
 		lineageTag: 1efe538d-459f-425c-966b-bc63698ba02e
+
+	measure 'Ctx Positive' =
+			
+			VAR _Years = FILTER(VALUES(DimDate[Year]), [Total Reviews] > 1000)
+			VAR _Best  = TOPN(1, _Years, [Positive %], DESC)
+			VAR _Worst = TOPN(1, _Years, [Positive %], ASC)
+			RETURN
+			"Best " & MAXX(_Best, DimDate[Year]) & ": " & FORMAT(MAXX(_Best, [Positive %]), "0%") &
+			" · Lowest " & MAXX(_Worst, DimDate[Year]) & ": " & FORMAT(MAXX(_Worst, [Positive %]), "0%")
+		lineageTag: 7690eb64-cc5f-461d-a153-83ce2e724870
+
+	measure 'Ctx Negative' =
+			
+			VAR _Years = FILTER(VALUES(DimDate[Year]), [Total Reviews] > 1000)
+			VAR _High  = TOPN(1, _Years, [Negative %], DESC)
+			VAR _Low   = TOPN(1, _Years, [Negative %], ASC)
+			RETURN
+			"Highest " & MAXX(_High, DimDate[Year]) & ": " & FORMAT(MAXX(_High, [Negative %]), "0.0%") &
+			" · Lowest " & MAXX(_Low, DimDate[Year]) & ": " & FORMAT(MAXX(_Low, [Negative %]), "0.0%")
+		lineageTag: 5c635722-29ca-4bf0-af0a-80bc46f1cd4f
+
+	measure 'Ctx Listings' =
+			
+			VAR _Entire  = DIVIDE(CALCULATE([Total Listings], Dim_Listings[ROOM_TYPE] = "Entire home/apt"), [Total Listings])
+			VAR _Private = DIVIDE(CALCULATE([Total Listings], Dim_Listings[ROOM_TYPE] = "Private room"), [Total Listings])
+			RETURN FORMAT(_Entire, "0%") & " entire homes · " & FORMAT(_Private, "0%") & " private rooms"
+		lineageTag: 7dce6367-6fbe-42fd-aaf9-7d04c315a591
+
+	measure Measure
+		lineageTag: 3fed0ce1-510a-4fa3-be24-2b766b93a383
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	measure 'Ctx Price' =
+			
+			"Median " & FORMAT(MEDIAN(Dim_Listings[PRICE]), "$#,0") &
+			" · Entire home " & FORMAT(CALCULATE([Avg Price], Dim_Listings[ROOM_TYPE] = "Entire home/apt"), "$#,0")
+		lineageTag: 3686f748-fa7a-4b21-8050-f0baf7c706fd
+
+	measure 'Ctx Hosts' =
+			
+			VAR _Single = DIVIDE(CALCULATE([Total Hosts], Dim_Hosts[PORTFOLIO_SIZE] = "single_listing"), [Total Hosts])
+			VAR _Large  = CALCULATE([Total Hosts], Dim_Hosts[PORTFOLIO_SIZE] = "large_portfolio")
+			RETURN FORMAT(_Single, "0%") & " own 1 listing · " & _Large & " own 16+"
+		lineageTag: 564ffa68-210e-42f9-936e-c69ec58fe234
+
+	measure 'Positive Rate' = [Positive %]
+		lineageTag: 800342ab-59b4-4e51-97cc-b0003bf00f74
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Negative Rate' = [Negative %]
+		lineageTag: 5ae4b294-4f26-4938-90e8-c7512e039b09
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Listings Share' =
+			
+			DIVIDE(
+			    SUM(Dim_Hosts[TOTAL_LISTINGS]),
+			    CALCULATE(SUM(Dim_Hosts[TOTAL_LISTINGS]), ALL(Dim_Hosts[PORTFOLIO_SIZE]))
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 409782b5-6e49-43eb-a582-5ac1781c8420
 
 	column Column
 		formatString: 0
